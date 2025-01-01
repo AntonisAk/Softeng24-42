@@ -89,7 +89,7 @@ async function createTables() {
 async function importStations(filePath) {
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const records = parse(fileContent, {
-    columns: true,
+    columns: (header) => header.map((col) => col.trim()),
     skip_empty_lines: true,
   });
 
@@ -98,18 +98,10 @@ async function importStations(filePath) {
   try {
     await client.query("BEGIN");
 
-    // First insert operators
-    const operators = new Set(
-      records.map((record) => ({
-        id: record.OpID,
-        name: record.Operator,
-      }))
-    );
-
-    for (const operator of operators) {
+    for (const record of records) {
       await client.query(
         "INSERT INTO Operators (OperatorID, Name) VALUES ($1, $2) ON CONFLICT (OperatorID) DO NOTHING",
-        [operator.id, operator.name]
+        [record.OpID, record.Operator]
       );
     }
 
@@ -148,7 +140,7 @@ async function importStations(filePath) {
 async function importPasses(filePath) {
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const records = parse(fileContent, {
-    columns: true,
+    columns: (header) => header.map((col) => col.trim()),
     skip_empty_lines: true,
   });
 

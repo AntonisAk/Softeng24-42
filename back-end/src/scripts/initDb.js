@@ -1,4 +1,4 @@
-// to run the script use: node src/scripts/initDb.js
+// to run the script use: node src/scripts/initDb.js if in the backend directory
 require("dotenv").config();
 const {
   createTables,
@@ -12,12 +12,15 @@ async function initializeDatabase() {
     // Create all tables
     await createTables();
 
-    // Import stations from CSV
+    // Import stations and passes from CSV
     const stationsPath = path.join(
       __dirname,
       "../../data/tollstations2024.csv"
     );
     await importStations(stationsPath);
+
+    const passesPath = path.join(__dirname, "../../data/passes-sample.csv");
+    await importPasses(passesPath);
 
     console.log("Database initialized successfully");
   } catch (error) {

@@ -6,11 +6,7 @@ const path = require("path");
 const adminController = {
   async healthcheck(req, res) {
     try {
-      const [
-        { count: n_stations } = { count: 0 },
-        { count: n_passes } = { count: 0 },
-        { count: n_tags } = { count: 0 },
-      ] = await Promise.all([
+      const [n_stations, n_passes, n_tags] = await Promise.all([
         pool.query("SELECT COUNT(*) FROM Tollstations"),
         pool.query("SELECT COUNT(*) FROM Passes"),
         pool.query("SELECT COUNT(DISTINCT tagRef) FROM Passes"),
@@ -19,12 +15,13 @@ const adminController = {
       res.json({
         status: "OK",
         dbconnection: process.env.DB_NAME,
-        n_stations: parseInt(n_stations),
-        n_tags: parseInt(n_tags),
-        n_passes: parseInt(n_passes),
+        n_stations: parseInt(n_stations.rows[0].count),
+        n_tags: parseInt(n_tags.rows[0].count),
+        n_passes: parseInt(n_passes.rows[0].count),
       });
     } catch (error) {
-      res.status(500).json({
+      console.log(error);
+      res.status(401).json({
         status: "failed",
         dbconnection: process.env.DB_NAME,
       });
@@ -61,6 +58,7 @@ const adminController = {
   async addPasses(req, res) {
     try {
       if (!req.file) {
+        // the uplaoded file has to have key/name file in reqbody
         throw new Error("No file uploaded");
       }
       await importPasses(req.file.path);
