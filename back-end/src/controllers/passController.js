@@ -159,6 +159,4 @@ const passController = {
   },
 };
 
-module.exports = {
-  passController,
-};
+module.exports = passController;

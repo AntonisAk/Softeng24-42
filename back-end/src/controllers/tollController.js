@@ -58,6 +58,4 @@ const tollController = {
   },
 };
 
-module.exports = {
-  tollController,
-};
+module.exports = tollController;

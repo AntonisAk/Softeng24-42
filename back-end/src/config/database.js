@@ -1,4 +1,7 @@
 const { Pool } = require("pg");
+require("dotenv").config({
+  path: require("path").resolve(__dirname, "../../.env"),
+}); // to locate the .env file which is 2 levels up
 
 const pool = new Pool({
   user: process.env.DB_USER,
