@@ -6,24 +6,21 @@ const schemas = require("../utils/validation");
 
 router.get(
   "/passAnalysis/:stationOpID/:tagOpID/:date_from/:date_to",
-  validate(schemas.operatorParams, "params"),
-  validate(schemas.dateParams, "params"),
+  validate(schemas.passAnalysisParams, "params"),
   validate(schemas.formatQuery, "query"),
   passController.getPassAnalysis
 );
 
 router.get(
   "/passesCost/:tollOpID/:tagOpID/:date_from/:date_to",
-  validate(schemas.operatorParams, "params"),
-  validate(schemas.dateParams, "params"),
+  validate(schemas.passesCostParams, "params"),
   validate(schemas.formatQuery, "query"),
   passController.getPassesCost
 );
 
 router.get(
   "/chargesBy/:tollOpID/:date_from/:date_to",
-  validate(schemas.singleOperatorParams, "params"),
-  validate(schemas.dateParams, "params"),
+  validate(schemas.chargesByParams, "params"),
   validate(schemas.formatQuery, "query"),
   passController.getChargesBy
 );

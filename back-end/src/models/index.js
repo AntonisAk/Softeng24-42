@@ -44,7 +44,7 @@ class Pass {
       `SELECT p.*
        FROM Passes p
        JOIN Tollstations t ON p.TollID = t.TollID
-       WHERE t.OperatorID = $1 
+       WHERE t.TollID = $1 
        AND p.tagHomeID = $2
        AND p.timestamp BETWEEN $3 AND $4
        ORDER BY p.timestamp ASC`,

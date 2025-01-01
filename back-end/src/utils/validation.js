@@ -3,22 +3,32 @@ const Joi = require("joi");
 const dateRegex = /^\d{8}$/;
 
 const schemas = {
-  dateParams: Joi.object({
+  stationDateParams: Joi.object({
+    tollStationID: Joi.string().required(),
     date_from: Joi.string().pattern(dateRegex).required(),
     date_to: Joi.string().pattern(dateRegex).required(),
   }),
 
-  stationParams: Joi.object({
-    tollStationID: Joi.string().required(),
-  }),
-
-  operatorParams: Joi.object({
+  passAnalysisParams: Joi.object({
     stationOpID: Joi.string().required(),
     tagOpID: Joi.string().required(),
+    date_from: Joi.string().pattern(dateRegex).required(),
+    date_to: Joi.string().pattern(dateRegex).required(),
   }),
 
-  singleOperatorParams: Joi.object({
+  // Combined schema for passesCost route
+  passesCostParams: Joi.object({
     tollOpID: Joi.string().required(),
+    tagOpID: Joi.string().required(),
+    date_from: Joi.string().pattern(dateRegex).required(),
+    date_to: Joi.string().pattern(dateRegex).required(),
+  }),
+
+  // Combined schema for chargesBy route
+  chargesByParams: Joi.object({
+    tollOpID: Joi.string().required(),
+    date_from: Joi.string().pattern(dateRegex).required(),
+    date_to: Joi.string().pattern(dateRegex).required(),
   }),
 
   formatQuery: Joi.object({

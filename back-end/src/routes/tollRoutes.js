@@ -6,8 +6,7 @@ const schemas = require("../utils/validation");
 
 router.get(
   "/:tollStationID/:date_from/:date_to",
-  validate(schemas.stationParams, "params"),
-  validate(schemas.dateParams, "params"),
+  validate(schemas.stationDateParams, "params"),
   validate(schemas.formatQuery, "query"),
   tollController.getStationPasses
 );
