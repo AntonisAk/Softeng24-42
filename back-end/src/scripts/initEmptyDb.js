@@ -7,9 +7,9 @@ async function initializeEmptyDatabase() {
   try {
     // Create all tables
     await createTables();
-    console.log("Database initialized successfully");
+    console.log("Empty Database initialized successfully");
   } catch (error) {
-    console.error("Error initializing database:", error);
+    console.error("Error initializing empty database:", error);
     process.exit(1);
   }
 }
