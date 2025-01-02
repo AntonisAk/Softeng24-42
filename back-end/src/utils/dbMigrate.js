@@ -1,4 +1,5 @@
 const pool = require("../config/database");
+const { Debt } = require("../models");
 const fs = require("fs");
 const path = require("path");
 const { parse } = require("csv-parse/sync");
@@ -127,6 +128,15 @@ async function importStations(filePath) {
       );
     }
 
+    // Insert all combinations of operators into the Debts table with Amount = 0
+    await client.query(`
+      INSERT INTO Debts (FromOperatorID, ToOperatorID, Amount)
+      SELECT op1.OperatorID AS FromOperatorID, op2.OperatorID AS ToOperatorID, 0 AS Amount
+      FROM Operators op1
+      CROSS JOIN Operators op2
+      WHERE op1.OperatorID <> op2.OperatorID; -- Exclude self-debts
+    `);
+
     await client.query("COMMIT");
     console.log("Stations imported successfully");
   } catch (err) {
@@ -150,6 +160,12 @@ async function importPasses(filePath) {
     await client.query("BEGIN");
 
     for (const record of records) {
+      const stationResult = await client.query(
+        `SELECT OperatorID FROM Tollstations WHERE TollID = $1`,
+        [record.tollID]
+      );
+      const tollOperatorId = stationResult.rows[0].OperatorID;
+
       await client.query(
         `INSERT INTO Passes (timestamp, TollID, tagRef, tagHomeID, charge)
          VALUES ($1, $2, $3, $4, $5)`,
@@ -161,7 +177,17 @@ async function importPasses(filePath) {
           record.charge,
         ]
       );
+
+      if (tollOperatorId !== record.tagHomeID) {
+        await Debt.updateDebtFromPass(
+          tollOperatorId,
+          record.tagHomeID,
+          record.charge
+        );
+      }
     }
+
+    await Debt.reconcileDebts();
 
     await client.query("COMMIT");
     console.log("Passes imported successfully");
