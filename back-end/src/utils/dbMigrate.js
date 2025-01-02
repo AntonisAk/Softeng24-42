@@ -164,7 +164,8 @@ async function importPasses(filePath) {
         `SELECT OperatorID FROM Tollstations WHERE TollID = $1`,
         [record.tollID]
       );
-      const tollOperatorId = stationResult.rows[0].OperatorID;
+
+      const tollOperatorId = stationResult.rows[0].operatorid;
 
       await client.query(
         `INSERT INTO Passes (timestamp, TollID, tagRef, tagHomeID, charge)
@@ -199,8 +200,39 @@ async function importPasses(filePath) {
   }
 }
 
+async function dropTables() {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    // Drop Debts table
+    await client.query(`DROP TABLE IF EXISTS Debts CASCADE;`);
+    // Drop Passes table
+    await client.query(`DROP TABLE IF EXISTS Passes CASCADE;`);
+    // Drop Tollstations table
+    await client.query(`DROP TABLE IF EXISTS Tollstations CASCADE;`);
+    // Drop Operating_User table
+    await client.query(`DROP TABLE IF EXISTS Operating_User CASCADE;`);
+    // Drop Operators table
+    await client.query(`DROP TABLE IF EXISTS Operators CASCADE;`);
+    // Drop Users table
+    await client.query(`DROP TABLE IF EXISTS Users CASCADE;`);
+
+    await client.query("COMMIT");
+    console.log("All tables in the database dropped successfully.");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Error dropping tables:", err);
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   createTables,
   importStations,
   importPasses,
+  dropTables,
 };

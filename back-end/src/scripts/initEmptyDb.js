@@ -6,6 +6,7 @@ const path = require("path");
 async function initializeEmptyDatabase() {
   try {
     // Create all tables
+    await dropTables();
     await createTables();
     console.log("Empty Database initialized successfully");
   } catch (error) {

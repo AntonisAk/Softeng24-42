@@ -4,12 +4,14 @@ const {
   createTables,
   importStations,
   importPasses,
+  dropTables,
 } = require("../utils/dbMigrate");
 const path = require("path");
 
 async function initializeDatabase() {
   try {
     // Create all tables
+    await dropTables();
     await createTables();
 
     // Import stations and passes from CSV

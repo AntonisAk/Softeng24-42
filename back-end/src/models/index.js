@@ -108,6 +108,18 @@ class Debt {
            WHERE FromOperatorID = $1 AND ToOperatorID = $2`,
         [tagOperatorId, tollOperatorId, charge]
       );
+
+      // Add logging to debug
+      /*
+      const result = await pool.query(
+        `SELECT Amount FROM Debts 
+         WHERE FromOperatorID = $1 AND ToOperatorID = $2`,
+        [tagOperatorId, tollOperatorId]
+      );
+      console.log(
+        `Updated debt from ${tagOperatorId} to ${tollOperatorId} with charge ${charge}. New amount: ${result.rows[0]?.Amount}`
+      );
+      */
     } catch (error) {
       throw error;
     }
