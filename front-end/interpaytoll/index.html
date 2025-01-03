@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InterPayToll</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #333;
+      color: white;
+      padding: 20px 0;
+      position: relative;
+    }
+
+    .title {
+      font-size: 40px;
+      font-family: 'Arial', sans-serif;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #4CAF50; /* Green color */
+      text-align: center;
+    }
+
+    /* User info dropdown with avatar */
+    .user-info {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #ddd;
+      margin-right: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .dropdown-btn {
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .dropdown-btn:hover {
+      background-color: #45a049;
+    }
+
+    #dropdown-arrow {
+      margin-left: 10px;
+      font-size: 12px; /* Μικρότερο βελάκι */
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 60px;
+      background-color: #333;
+      color: white;
+      padding: 15px;
+      width: 250px;
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+      border-radius: 5px;
+    }
+
+    .dropdown-content p {
+      margin: 5px 0;
+    }
+
+    .dropdown-content button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      width: 100%;
+    }
+
+    .dropdown-content button:hover {
+      background-color: #e53935;
+    }
+
+    /* Tabs styles */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      background-color: #333;
+      padding: 10px 0;
+    }
+
+    .tab {
+      padding: 15px 30px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      text-align: center;  /* Στοίχιση των tab ονομάτων στο κέντρο */
+    }
+
+    .tab:hover {
+      background-color: #555;
+    }
+
+    .tab.active {
+      background-color: #4CAF50;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 20px;
+      background-color: #fff;
+      margin: 0 auto;
+      max-width: 900px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    #interactiveMap {
+      width: 100%;
+      height: 400px;
+    }
+
+    .form-group {
+      margin: 10px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .form-group input {
+      padding: 10px;
+      width: 200px;
+      margin-right: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .form-group button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .form-group button:hover {
+      background-color: #45a049;
+    }
+
+    .export-btn {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+      position: absolute;  /* Τοποθέτηση στο ίδιο ύψος με τα πεδία ημερομηνίας */
+      right: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .export-btn:hover {
+      background-color: #1976D2;
+    }
+
+    .export-btn #export-arrow {
+      margin-left: 5px;
+      font-size: 12px; /* Μικρότερο βελάκι για το export */
+    }
+
+    .logout-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .logout-btn:hover {
+      background-color: #e53935;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    td {
+      background-color: #fff;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    /* Additional styling for improved user experience */
+    .error-container {
+      margin: 15px 0;
+      padding: 10px;
+      background-color: #f8d7da;
+      border-radius: 5px;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .error-container p {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .tab-header {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .tabs {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header with app title -->
+<div class="header">
+  <div class="title">InterPayToll</div>
+</div>
+
+<!-- User info dropdown with avatar -->
+<div class="user-info">
+  <div class="user-avatar">
+    <span>JD</span> <!-- Placeholder for user avatar -->
+  </div>
+  <button class="dropdown-btn" onclick="toggleDropdown()">
+    <span id="username">John</span>
+    <span id="dropdown-arrow">&#x25BC;</span>  <!-- Βελάκι κάτω -->
+  </button>
+  <div id="dropdownMenu" class="dropdown-content">
+    <p><strong>User Information:</strong></p>
+    <p>Username: JohnDoe</p>
+    <p>Email: johndoe@example.com</p>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<!-- Tabs navigation -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('passAnalysis')">Pass Analysis</div>
+  <div class="tab" onclick="showTab('passesCost')">Passes Cost</div>
+  <div class="tab" onclick="showTab('chargesBy')">Charges</div>
+  <div class="tab" onclick="showTab('interactiveMap')">Interactive Map</div>
+</div>
+
+<!-- Pass Analysis Tab -->
+<div id="passAnalysis" class="tab-content active">
+  <div class="tab-header">Pass Analysis</div>
+  <div class="form-group">
+    <label for="start-date">Start Date:</label>
+    <input type="date" id="start-date" name="start-date">
+    <label for="end-date">End Date:</label>
+    <input type="date" id="end-date" name="end-date">
+    <button onclick="fetchPassAnalysisData()">Fetch Data</button>
+    <button class="export-btn" onclick="exportData('passAnalysis')">
+      Export Data
+      <span id="export-arrow">&#x25BC;</span> <!-- Βελάκι export -->
+    </button>
+  </div>
+  <div id="passAnalysis-error" class="error-container" style="display: none;">
+    <p id="passAnalysis-error-message"></p>
+  </div>
+  <table id="passAnalysis-table"></table>
+</div>
+
+<!-- Passes Cost Tab -->
+<div id="passesCost" class="tab-content">
+  <div class="tab-header">Passes Cost</div>
+  <div class="form-group">
+    <label for="start-date-cost">Start Date:</label>
+    <input type="date" id="start-date-cost" name="start-date-cost">
+    <label for="end-date-cost">End Date:</label>
+    <input type="date" id="end-date-cost" name="end-date-cost">
+    <button onclick="fetchPassesCostData()">Fetch Data</button>
+    <button class="export-btn" onclick="exportData('passesCost')">
+      Export Data
+      <span id="export-arrow">&#x25BC;</span>
+    </button>
+  </div>
+  <div id="passesCost-error" class="error-container" style="display: none;">
+    <p id="passesCost-error-message"></p>
+  </div>
+  <table id="passesCost-table"></table>
+</div>
+
+<!-- Charges Tab -->
+<div id="chargesBy" class="tab-content">
+  <div class="tab-header">Charges</div>
+  <div class="form-group">
+    <label for="start-date-charges">Start Date:</label>
+    <input type="date" id="start-date-charges" name="start-date-charges">
+    <label for="end-date-charges">End Date:</label>
+    <input type="date" id="end-date-charges" name="end-date-charges">
+    <button onclick="fetchChargesByData()">Fetch Data</button>
+    <button class="export-btn" onclick="exportData('chargesBy')">
+      Export Data
+      <span id="export-arrow">&#x25BC;</span>
+    </button>
+  </div>
+  <div id="chargesBy-error" class="error-container" style="display: none;">
+    <p id="chargesBy-error-message"></p>
+  </div>
+  <table id="chargesBy-table"></table>
+</div>
+
+<!-- Interactive Map Tab -->
+<div id="interactiveMap" class="tab-content">
+  <h2>Interactive Map</h2>
+  <div id="interactiveMap"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<script>
+  // Simulate the logged-in user's name and avatar
+  document.getElementById('username').textContent = 'John';
+  document.querySelector('.user-avatar span').textContent = 'JD'; // Placeholder initials
+
+  // Function to toggle the dropdown menu visibility
+  function toggleDropdown() {
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const arrow = document.getElementById('dropdown-arrow');
+
+    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+
+    if (dropdownMenu.style.display === 'block') {
+      arrow.innerHTML = '&#x25B2;'; // Βελάκι προς τα πάνω
+    } else {
+      arrow.innerHTML = '&#x25BC;'; // Βελάκι προς τα κάτω
+    }
+  }
+
+  // Function to switch between tabs
+  function showTab(tabName) {
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => tab.classList.remove('active'));
+    contents.forEach(content => content.classList.remove('active'));
+
+    document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+    document.getElementById(tabName).classList.add('active');
+  }
+
+  // Function to export data (CSV/JSON)
+  function exportData(tabName) {
+    const format = prompt("Select export format: \n1. CSV \n2. JSON", "CSV");
+
+    if (format === "CSV") {
+      console.log(`Exporting data for ${tabName} in CSV format`);
+      // Add CSV export logic here
+    } else if (format === "JSON") {
+      console.log(`Exporting data for ${tabName} in JSON format`);
+      // Add JSON export logic here
+    } else {
+      alert("Invalid format selected");
+    }
+  }
+  
+  // Fetch and other logic...
+</script>
+
+</body>
+</html>

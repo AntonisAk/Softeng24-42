@@ -19,7 +19,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/tollStationPasses", tollRoutes);
 app.use("/api", passRoutes); // Will contain passAnalysis, passesCost, and chargesBy
 
-// Error handling
+// Global error handler
 app.use(errorHandler);
 
 module.exports = app;
