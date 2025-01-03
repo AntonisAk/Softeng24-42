@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "commander": "^13.0.0"
+  },
+
+  "bin": {
+  "mycli": "./cli/index.js"
+}
+}
