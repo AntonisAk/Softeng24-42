@@ -2,6 +2,36 @@ const pool = require("../config/database");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
+const register = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Check if username already exists
+    const userExists = await pool.query(
+      "SELECT UserID FROM Users WHERE Username = $1",
+      [username]
+    );
+    if (userExists.rowCount > 0) {
+      return res.status(400).json({ error: "error" });
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Insert new user into the database
+    const result = await pool.query(
+      "INSERT INTO Users (Username, Password, Role) VALUES ($1, $2, $3) RETURNING UserID, Username, Role",
+      [username, hashedPassword, "user"] // Default role as "user"
+    );
+
+    res.status(200).json({ success: "success" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "error" });
+  }
+};
+
 const login = async (req, res) => {
   const { username, password } = req.body;
 
@@ -42,7 +72,23 @@ const logout = async (req, res) => {
   res.status(200).send();
 };
 
+const users = async (req, res) => {
+  try {
+    // Insert new user into the database
+    const result = await pool.query("SELECT Username FROM Users");
+
+    const usernames = result.rows.map((row) => row.username);
+
+    res.status(200).json({ usernames });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "error" });
+  }
+};
+
 module.exports = {
   login,
   logout,
+  register,
+  users,
 };

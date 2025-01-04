@@ -1,6 +1,6 @@
 // to run the script use: node src/scripts/initEmptyDb.js if in the backend directory
 require("dotenv").config();
-const { createTables } = require("../utils/dbMigrate");
+const { createTables, dropTables } = require("../utils/dbMigrate");
 const path = require("path");
 
 async function initializeEmptyDatabase() {
