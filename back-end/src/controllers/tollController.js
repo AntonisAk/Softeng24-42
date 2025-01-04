@@ -1,6 +1,12 @@
 const { TollStation, Pass } = require("../models");
 const { formatResponse, getContentType } = require("../utils/formatResponse");
 
+// UTC+2
+const addTimezoneOffset = (date) => {
+  const offset = date.getTimezoneOffset(); // Offset in minutes
+  return new Date(date.getTime() - offset * 60000);
+};
+
 const tollController = {
   async getStationPasses(req, res) {
     try {
@@ -26,7 +32,7 @@ const tollController = {
       const response = {
         stationID: station.tollid,
         stationOperator: station.operatorid,
-        requestTimestamp: new Date()
+        requestTimestamp: addTimezoneOffset(new Date())
           .toISOString()
           .replace("T", " ")
           .slice(0, 16),
@@ -36,7 +42,7 @@ const tollController = {
         passList: passes.map((pass, index) => ({
           passIndex: index + 1,
           passID: pass.passid,
-          timestamp: pass.timestamp
+          timestamp: addTimezoneOffset(pass.timestamp)
             .toISOString()
             .replace("T", " ")
             .slice(0, 16),

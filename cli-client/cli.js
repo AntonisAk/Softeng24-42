@@ -63,13 +63,17 @@ const handlers = {
     return response.data;
   },
 
-  async resetpasses() {
-    const response = await api.post("/admin/resetpasses");
+  async resetpasses(argv) {
+    const response = await api.post("/admin/resetpasses", {
+      params: { format: argv.format },
+    });
     return response.data;
   },
 
-  async resetstations() {
-    const response = await api.post("/admin/resetstations");
+  async resetstations(argv) {
+    const response = await api.post("/admin/resetstations", {
+      params: { format: argv.format },
+    });
     return response.data;
   },
 
@@ -145,16 +149,16 @@ yargs(hideBin(process.argv))
     console.log(result);
   })
   .command("resetpasses", "Reset passes in the system", {}, async (argv) => {
-    const result = await handlers.resetpasses();
-    console.log(formatResponse(result, argv.format));
+    const result = await handlers.resetpasses(argv);
+    console.log(result);
   })
   .command(
     "resetstations",
     "Reset stations in the system",
     {},
     async (argv) => {
-      const result = await handlers.resetstations();
-      console.log(formatResponse(result, argv.format));
+      const result = await handlers.resetstations(argv);
+      console.log(result);
     }
   )
   .command(
@@ -358,8 +362,9 @@ yargs(hideBin(process.argv))
             headers: {
               ...formData.getHeaders(),
             },
+            params: { format: argv.format },
           });
-          console.log(formatResponse(response.data, argv.format));
+          console.log(response);
         } else {
           console.error(
             "Error: One of --usermod, --users, or --addpasses is required"
