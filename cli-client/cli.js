@@ -56,8 +56,10 @@ const formatResponse = (data, format = "csv") => {
 
 // Command handlers
 const handlers = {
-  async healthcheck() {
-    const response = await api.get("/admin/healthcheck");
+  async healthcheck(argv) {
+    const response = await api.get("/admin/healthcheck", {
+      params: { format: argv.format },
+    });
     return response.data;
   },
 
@@ -139,8 +141,8 @@ const handlers = {
 // Main CLI setup
 yargs(hideBin(process.argv))
   .command("healthcheck", "Check system health", {}, async (argv) => {
-    const result = await handlers.healthcheck();
-    console.log(formatResponse(result, argv.format));
+    const result = await handlers.healthcheck(argv);
+    console.log(result);
   })
   .command("resetpasses", "Reset passes in the system", {}, async (argv) => {
     const result = await handlers.resetpasses();
@@ -201,7 +203,7 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       const result = await handlers.tollstationpasses(argv);
-      console.log(formatResponse(result, argv.format));
+      console.log(result);
     }
   )
   .command(
@@ -231,7 +233,7 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       const result = await handlers.passanalysis(argv);
-      console.log(formatResponse(result, argv.format));
+      console.log(result);
     }
   )
   .command(
@@ -261,7 +263,7 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       const result = await handlers.passescost(argv);
-      console.log(formatResponse(result, argv.format));
+      console.log(result);
     }
   )
   .command(
@@ -286,7 +288,7 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       const result = await handlers.chargesby(argv);
-      console.log(formatResponse(result, argv.format));
+      console.log(result);
     }
   )
   .command(
@@ -333,7 +335,7 @@ yargs(hideBin(process.argv))
           });
           console.log(formatResponse(response.data, argv.format));
         } else if (argv.users) {
-          const response = await api.get("//users");
+          const response = await api.get("/users");
           console.log(formatResponse(response.data, argv.format));
         } else if (argv.addpasses) {
           if (!argv.source) {

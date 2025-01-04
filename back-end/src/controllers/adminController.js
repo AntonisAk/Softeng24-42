@@ -2,6 +2,7 @@ const { TollStation, Pass, Operator } = require("../models");
 const { importStations, importPasses } = require("../utils/dbMigrate");
 const pool = require("../config/database");
 const path = require("path");
+const { formatResponse, getContentType } = require("../utils/formatResponse");
 
 const adminController = {
   async healthcheck(req, res) {
@@ -12,13 +13,18 @@ const adminController = {
         pool.query("SELECT COUNT(DISTINCT tagRef) FROM Passes"),
       ]);
 
-      res.json({
+      const format = req.query.format || "json";
+
+      const response = {
         status: "OK",
         dbconnection: process.env.DB_NAME,
         n_stations: parseInt(n_stations.rows[0].count),
         n_tags: parseInt(n_tags.rows[0].count),
         n_passes: parseInt(n_passes.rows[0].count),
-      });
+      };
+
+      res.setHeader("Content-Type", getContentType(format));
+      res.send(formatResponse(response, format));
     } catch (error) {
       console.log(error);
       res.status(401).json({
@@ -34,7 +40,10 @@ const adminController = {
       await importStations(
         path.join(__dirname, "../../data/tollstations2024.csv")
       );
-      res.json({ status: "OK" });
+      const format = req.query.format || "json";
+      const response = { status: "OK" };
+      res.setHeader("Content-Type", getContentType(format));
+      res.send(formatResponse(response, format));
     } catch (error) {
       res.json({
         status: "failed",
@@ -46,7 +55,11 @@ const adminController = {
   async resetPasses(req, res) {
     try {
       await Pass.deleteAllPasses();
-      res.json({ status: "OK" });
+      await pool.query("TRUNCATE TABLE Debts CASCADE");
+      const format = req.query.format || "json";
+      const response = { status: "OK" };
+      res.setHeader("Content-Type", getContentType(format));
+      res.send(formatResponse(response, format));
     } catch (error) {
       res.json({
         status: "failed",
@@ -62,7 +75,10 @@ const adminController = {
         throw new Error("No file uploaded");
       }
       await importPasses(req.file.path);
-      res.json({ status: "OK" });
+      const format = req.query.format || "json";
+      const response = { status: "OK" };
+      res.setHeader("Content-Type", getContentType(format));
+      res.send(formatResponse(response, format));
     } catch (error) {
       res.json({
         status: "failed",
