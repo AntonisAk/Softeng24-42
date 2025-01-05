@@ -55,7 +55,7 @@ const adminController = {
   async resetPasses(req, res) {
     try {
       await Pass.deleteAllPasses();
-      await pool.query("TRUNCATE TABLE Debts CASCADE");
+      await pool.query("UPDATE Debts SET amount = $1", [0]);
       const format = req.query.format || "json";
       const response = { status: "OK" };
       res.setHeader("Content-Type", getContentType(format));

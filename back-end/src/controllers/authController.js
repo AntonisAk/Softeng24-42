@@ -1,6 +1,7 @@
 const pool = require("../config/database");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const stringify = require("csv-stringify");
 
 const register = async (req, res) => {
   const { username, password } = req.body;
@@ -12,7 +13,7 @@ const register = async (req, res) => {
       [username]
     );
     if (userExists.rowCount > 0) {
-      return res.status(400).json({ error: "error" });
+      return res.status(400).json({ status: "error" });
     }
 
     // Hash the password
@@ -25,10 +26,10 @@ const register = async (req, res) => {
       [username, hashedPassword, "user"] // Default role as "user"
     );
 
-    res.status(200).json({ success: "success" });
+    res.status(200).json({ status: "success" });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: "error" });
+    res.status(500).json({ status: "error" });
   }
 };
 
@@ -76,13 +77,14 @@ const users = async (req, res) => {
   try {
     // Insert new user into the database
     const result = await pool.query("SELECT Username FROM Users");
-
     const usernames = result.rows.map((row) => row.username);
-
-    res.status(200).json({ usernames });
+    const csvData = `Usernames\n${usernames
+      .map((username) => `${username}\n`)
+      .join("")}`;
+    res.send(csvData);
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: "error" });
+    res.status(500).json({ status: "error" });
   }
 };
 

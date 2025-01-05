@@ -1,25 +1,32 @@
 #!/usr/bin/env node
 
+const TOKEN_FILE = ".auth_token"; // to store token when user logs in
+
 const axios = require("axios");
 const yargs = require("yargs");
 const { hideBin } = require("yargs/helpers");
 const fs = require("fs");
 const FormData = require("form-data");
-//const https = require("https");
+const { stringify } = require("csv-stringify/sync");
+const https = require("https");
 
 // Configuration
-// const BASE_URL = "https://localhost:9115/api";
-const BASE_URL = "http://localhost:9115/api";
+const BASE_URL = "https://localhost:9115/api";
 let authToken = null;
 
 // Axios instance with default config
 const api = axios.create({
   baseURL: BASE_URL,
   validateStatus: false,
-  /*httpsAgent: new https.Agent({
+  httpsAgent: new https.Agent({
     rejectUnauthorized: false, // Allow self-signed certificates
-  }),*/
+  }),
 });
+
+// Load token if it exists
+if (fs.existsSync(TOKEN_FILE)) {
+  authToken = fs.readFileSync(TOKEN_FILE, "utf8");
+}
 
 // Add auth token to requests if it exists
 api.interceptors.request.use((config) => {
@@ -29,30 +36,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Helper function to format response based on format flag
-const formatResponse = (data, format = "csv") => {
-  if (format === "json") {
-    return JSON.stringify(data, null, 2);
+function formatResponse(data, format = "csv") {
+  if (format === "csv") {
+    if (!Array.isArray(data)) {
+      // Convert single object to array for CSV conversion
+      data = [data];
+    }
+    return stringify(data, {
+      header: true,
+      delimiter: ",",
+    });
   }
-
-  // Convert to CSV
-  if (!data || typeof data !== "object") return "";
-
-  // Handle different response structures
-  if (Array.isArray(data)) {
-    const headers = Object.keys(data[0] || {});
-    const csv = [
-      headers.join(","),
-      ...data.map((row) => headers.map((header) => row[header]).join(",")),
-    ].join("\n");
-    return csv;
-  } else {
-    const entries = Object.entries(data).map(
-      ([key, value]) => `${key},${value}`
-    );
-    return entries.join("\n");
-  }
-};
+  return data;
+}
 
 // Command handlers
 const handlers = {
@@ -85,6 +81,7 @@ const handlers = {
 
     if (response.data.token) {
       authToken = response.data.token;
+      fs.writeFileSync(TOKEN_FILE, authToken, "utf8");
       return { authToken };
     }
     return { status: "error", message: "Login failed" };
@@ -96,6 +93,9 @@ const handlers = {
     }
     const response = await api.post("/logout");
     authToken = null;
+    if (fs.existsSync(TOKEN_FILE)) {
+      fs.unlinkSync(TOKEN_FILE); // Delete the token file
+    }
     return { status: "success", message: "Logout successful" };
   },
 
@@ -132,16 +132,6 @@ const handlers = {
   },
 };
 
-/*
-.option('format', {
-    describe: 'Output format',
-    choices: ['json', 'csv'],
-    default: 'csv'
-})
-.help()
-.argv;
-*/
-
 // Main CLI setup
 yargs(hideBin(process.argv))
   .command("healthcheck", "Check system health", {}, async (argv) => {
@@ -150,7 +140,7 @@ yargs(hideBin(process.argv))
   })
   .command("resetpasses", "Reset passes in the system", {}, async (argv) => {
     const result = await handlers.resetpasses(argv);
-    console.log(result);
+    console.log(formatResponse(result, argv.format));
   })
   .command(
     "resetstations",
@@ -158,7 +148,7 @@ yargs(hideBin(process.argv))
     {},
     async (argv) => {
       const result = await handlers.resetstations(argv);
-      console.log(result);
+      console.log(formatResponse(result, argv.format));
     }
   )
   .command(
@@ -340,7 +330,7 @@ yargs(hideBin(process.argv))
           console.log(formatResponse(response.data, argv.format));
         } else if (argv.users) {
           const response = await api.get("/users");
-          console.log(formatResponse(response.data, argv.format));
+          console.log(response.data);
         } else if (argv.addpasses) {
           if (!argv.source) {
             console.error("Error: --source is required for --addpasses");
@@ -364,7 +354,7 @@ yargs(hideBin(process.argv))
             },
             params: { format: argv.format },
           });
-          console.log(response);
+          console.log(response.data);
         } else {
           console.error(
             "Error: One of --usermod, --users, or --addpasses is required"
