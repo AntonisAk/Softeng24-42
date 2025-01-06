@@ -1,0 +1,1575 @@
+{
+	"info": {
+		"_postman_id": "de800ceb-4cce-4ac1-a4a1-ff13991f7114",
+		"name": "InterPayTollApi",
+		"description": "The REST API is designed to manage toll station interoperability data. It supports operations for storing and retrieving information, adhering to the following base URL:\n\n**Base URL:** `https://{{host}}:9115/api`\n\nAll API endpoints are structured as:  \n`{baseURL}/{service}/{path-to-resource}`\n\nData formats supported: JSON (`application/json`) and CSV (`text/csv`). The default format is JSON if not specified.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40108117"
+	},
+	"item": [
+		{
+			"name": "Management",
+			"item": [
+				{
+					"name": "https://localhost:9115/api/admin/healthcheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:9115/api/admin/healthcheck",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"admin",
+								"healthcheck"
+							]
+						},
+						"description": "Check connectivity and see info about the current data"
+					},
+					"response": [
+						{
+							"name": "healthcheck_output",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:9115/api/admin/healthcheck",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "9115",
+									"path": [
+										"api",
+										"admin",
+										"healthcheck"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "90"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"5a-8UoX5tf/ob9bohelBskxhsVN5Vs\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 05 Jan 2025 22:55:23 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"OK\",\n    \"dbconnection\": \"interpaytoll\",\n    \"n_stations\": 253,\n    \"n_tags\": 50,\n    \"n_passes\": 1002\n}"
+						}
+					]
+				},
+				{
+					"name": "https://localhost:9115/api/admin/resetstations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Content-Type header is application/json\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required field 'status'\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.status).to.exist;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Status field should be a string\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData.status).to.be.a('string');",
+									"});",
+									"",
+									"",
+									"pm.test(\"Status field should not be empty\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData.status).to.exist.and.to.not.be.empty;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:9115/api/admin/resetstations",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"admin",
+								"resetstations"
+							]
+						},
+						"description": "Initiallizes toll stations data in the database based on the tollstations.csv available in our server"
+					},
+					"response": [
+						{
+							"name": "resetstations_output",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:9115/api/admin/resetstations",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "9115",
+									"path": [
+										"api",
+										"admin",
+										"resetstations"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "15"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"f-v/Y1JusChTxrQUzPtNAKycooOTA\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 05 Jan 2025 22:58:53 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"OK\"\n}"
+						}
+					]
+				},
+				{
+					"name": "https://localhost:9115/api/admin/resetpasses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Content type is application/json\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required field 'status'\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.have.property('status');",
+									"});",
+									"",
+									"",
+									"pm.test(\"Status field is a non-empty string\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData.status).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Status should not be empty\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Status field contains the expected values\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData.status).to.exist;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:9115/api/admin/resetpasses",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"admin",
+								"resetpasses"
+							]
+						},
+						"description": "Clears passes data in the database and initiallizes the admin user credentials"
+					},
+					"response": [
+						{
+							"name": "resetpasses_output",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:9115/api/admin/resetpasses",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "9115",
+									"path": [
+										"api",
+										"admin",
+										"resetpasses"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "15"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"f-v/Y1JusChTxrQUzPtNAKycooOTA\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 05 Jan 2025 23:02:16 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"OK\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Endpoints that offer help for automatic testing."
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "http://localhost:9115/api/admin/addpasses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required field - status\", function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.have.property('status');",
+									"});",
+									"",
+									"",
+									"pm.test(\"Status is a non-empty string\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.status).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Status should not be empty\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Content-Type header is application/json\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Status field has a valid value\", function () {",
+									"  const responseData = pm.response.json();",
+									"",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData.status).to.exist.and.to.not.be.empty;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "jwt",
+							"jwt": [
+								{
+									"key": "algorithm",
+									"value": "HS256",
+									"type": "string"
+								},
+								{
+									"key": "isSecretBase64Encoded",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "payload",
+									"value": "{}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "Bearer",
+									"type": "string"
+								},
+								{
+									"key": "queryParamKey",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "header",
+									"value": "{}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-OBSERVATORY-AUTH",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "IBE4o4Tw6/passes-sample.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://localhost:9115/api/admin/addpasses",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"admin",
+								"addpasses"
+							]
+						},
+						"description": "Adds new passes data to the database"
+					},
+					"response": [
+						{
+							"name": "addpasses_output",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-OBSERVATORY-AUTH",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE4MTg2LCJleHAiOjE3MzYyMDQ1ODZ9.65oJOoSxx82fF_vvym8MdIj4ozeKZgnBZ0wLp3TrQcY",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "IBE4o4Tw6/passes-sample.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:9115/api/admin/addpasses",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "9115",
+									"path": [
+										"api",
+										"admin",
+										"addpasses"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "15"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"f-v/Y1JusChTxrQUzPtNAKycooOTA\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 05 Jan 2025 23:05:45 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"OK\"\n}"
+						}
+					]
+				},
+				{
+					"name": "https://localhost:9115/api/register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-OBSERVATORY-AUTH",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"olympos\",\r\n    \"password\": \"kolomuani\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:9115/api/register",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"register"
+							]
+						},
+						"description": "Create accounts by providing username and password"
+					},
+					"response": [
+						{
+							"name": "register_output",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-OBSERVATORY-AUTH",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE4MTg2LCJleHAiOjE3MzYyMDQ1ODZ9.65oJOoSxx82fF_vvym8MdIj4ozeKZgnBZ0wLp3TrQcY",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"olympos\",\r\n    \"password\": \"kolomuani\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:9115/api/register",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "9115",
+									"path": [
+										"api",
+										"register"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "20"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"14-Y53wuE/mmbSikKcT/WualL1N65U\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 05 Jan 2025 23:08:53 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\"\n}"
+						}
+					]
+				},
+				{
+					"name": "https://localhost:9115/api/users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-OBSERVATORY-AUTH",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3MzYxMTU5MDksImV4cCI6MTczNjIwMjMwOX0.H0pbARAA3VfcYX85fJkNrGAmulvGATRpTTNK93AGUSI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:9115/api/users",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Get a list of all available users. (meant to be used in the cli (only supports csv))"
+					},
+					"response": [
+						{
+							"name": "users_output",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-OBSERVATORY-AUTH",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE4MTg2LCJleHAiOjE3MzYyMDQ1ODZ9.65oJOoSxx82fF_vvym8MdIj4ozeKZgnBZ0wLp3TrQcY",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:9115/api/users",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "9115",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "16"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"10-uiO8IY18BrulILO3p4tYzo+4OaU\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 05 Jan 2025 23:06:34 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "Usernames\nadmin\n"
+						}
+					]
+				}
+			],
+			"description": "Actions that can only be performed by the admin for the correct handling of the InterPayToll system"
+		},
+		{
+			"name": "Tolls",
+			"item": [
+				{
+					"name": "https://localhost:9115/api/tollStationPasses/:tollStationID/:date_from/:date_to",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Response status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test('Content-Type header is application/json', function () {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+									"})",
+									"",
+									"pm.test('Response has the required fields', function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.include.all.keys('stationID', 'stationOperator', 'requestTimestamp', 'periodFrom', 'periodTo', 'nPasses');",
+									"})",
+									"",
+									"pm.test('Timestamp is in a valid date format', function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.passList).to.be.an('array');",
+									"    responseData.passList.forEach(function (pass) {",
+									"        pm.expect(pass.timestamp).to.match(/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$/);",
+									"    });",
+									"})",
+									"",
+									"pm.test('PassList is an array with at least one element', function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.passList).to.be.an('array').and.to.have.lengthOf.at.least(1);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-OBSERVATORY-AUTH",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "https://localhost:9115/api/tollStationPasses/AM02/20220101/20220109",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"tollStationPasses",
+								"AM02",
+								"20220101",
+								"20220109"
+							]
+						},
+						"description": "Returns passes data specific to a toll station (tollstationID) in a specific period of time."
+					},
+					"response": [
+						{
+							"name": "tollstationpasses_output",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-OBSERVATORY-AUTH",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:9115/api/tollStationPasses/AM02/20220101/20220109",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "9115",
+									"path": [
+										"api",
+										"tollStationPasses",
+										"AM02",
+										"20220101",
+										"20220109"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "827"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"33b-Sb6mj/h0pL1aFROsr5SOIQ54h5w\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 05 Jan 2025 23:10:03 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"stationID\": \"AM02\",\n    \"stationOperator\": \"AM\",\n    \"requestTimestamp\": \"2025-01-06 01:10\",\n    \"periodFrom\": \"2022-01-01\",\n    \"periodTo\": \"2022-01-09\",\n    \"nPasses\": 5,\n    \"passList\": [\n        {\n            \"passIndex\": 1,\n            \"passID\": 1233,\n            \"timestamp\": \"2022-01-04 09:59\",\n            \"tagID\": \"AMHJ7XVG0\",\n            \"tagProvider\": \"AM\",\n            \"passType\": \"home\",\n            \"passCharge\": 2\n        },\n        {\n            \"passIndex\": 2,\n            \"passID\": 1376,\n            \"timestamp\": \"2022-01-06 13:03\",\n            \"tagID\": \"NOQLL8OS9\",\n            \"tagProvider\": \"NO\",\n            \"passType\": \"visitor\",\n            \"passCharge\": 2\n        },\n        {\n            \"passIndex\": 3,\n            \"passID\": 1385,\n            \"timestamp\": \"2022-01-06 16:46\",\n            \"tagID\": \"AMXAJI0Y6\",\n            \"tagProvider\": \"AM\",\n            \"passType\": \"home\",\n            \"passCharge\": 2\n        },\n        {\n            \"passIndex\": 4,\n            \"passID\": 1392,\n            \"timestamp\": \"2022-01-06 18:10\",\n            \"tagID\": \"AMHJ7XVG0\",\n            \"tagProvider\": \"AM\",\n            \"passType\": \"home\",\n            \"passCharge\": 2\n        },\n        {\n            \"passIndex\": 5,\n            \"passID\": 1469,\n            \"timestamp\": \"2022-01-07 21:00\",\n            \"tagID\": \"EGRHOCN9J\",\n            \"tagProvider\": \"EG\",\n            \"passType\": \"visitor\",\n            \"passCharge\": 2\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "https://localhost:9115/api/passAnalysis/:stationOpID/:tagOpID/:date_from/:date_to",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response Content-Type is application/json\", function () {",
+									"  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.have.property('stationOpID');",
+									"    pm.expect(responseData).to.have.property('tagOpID');",
+									"    pm.expect(responseData).to.have.property('requestTimestamp');",
+									"    pm.expect(responseData).to.have.property('periodFrom');",
+									"    pm.expect(responseData).to.have.property('periodTo');",
+									"    pm.expect(responseData).to.have.property('nPasses');",
+									"    pm.expect(responseData).to.have.property('passList');",
+									"});",
+									"",
+									"",
+									"pm.test(\"PassCharge is a non-negative integer\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData.passList).to.be.an('array');",
+									"  responseData.passList.forEach(function(pass) {",
+									"    pm.expect(pass.passCharge).to.be.a('number').and.to.satisfy((value) => value >= 0, \"PassCharge should be a non-negative integer\");",
+									"  });",
+									"});",
+									"",
+									"",
+									"pm.test(\"PassList array is present and contains the expected number of elements\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.passList).to.exist.and.to.be.an('array');",
+									"    pm.expect(responseData.passList).to.have.lengthOf(1);",
+									"});",
+									"",
+									"",
+									"pm.test(\"PassList properties are present and have valid formats\", function () {",
+									"    const responseData = pm.response.json();",
+									"",
+									"    pm.expect(responseData.passList).to.be.an('array').that.is.not.empty;",
+									"",
+									"    responseData.passList.forEach(function(pass) {",
+									"        pm.expect(pass).to.have.property('passIndex').that.is.a('number');",
+									"        pm.expect(pass).to.have.property('passID').that.is.a('number');",
+									"        pm.expect(pass).to.have.property('stationID').that.is.a('string').and.not.empty;",
+									"        pm.expect(pass).to.have.property('timestamp').that.is.a('string').and.not.empty;",
+									"        pm.expect(pass).to.have.property('tagID').that.is.a('string').and.not.empty;",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-OBSERVATORY-AUTH",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:9115/api/passAnalysis/AM09/NO/20220101/20220109",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"passAnalysis",
+								"AM09",
+								"NO",
+								"20220101",
+								"20220109"
+							]
+						},
+						"description": "Returns passes data that happen from cars that belong to the tagOpId to stations that belong to stationOpID"
+					},
+					"response": [
+						{
+							"name": "passanalysis_output",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-OBSERVATORY-AUTH",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:9115/api/passAnalysis/AM09/NO/20220101/20220109",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "9115",
+									"path": [
+										"api",
+										"passAnalysis",
+										"AM09",
+										"NO",
+										"20220101",
+										"20220109"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "267"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"10b-tqwaZ5luE4K6gmMHIQakzrdfpZE\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 05 Jan 2025 23:11:10 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"stationOpID\": \"AM09\",\n    \"tagOpID\": \"NO\",\n    \"requestTimestamp\": \"2025-01-06 01:11\",\n    \"periodFrom\": \"2022-01-01\",\n    \"periodTo\": \"2022-01-09\",\n    \"nPasses\": 1,\n    \"passList\": [\n        {\n            \"passIndex\": 1,\n            \"passID\": 1006,\n            \"stationID\": \"AM09\",\n            \"timestamp\": \"2022-01-01 01:29\",\n            \"tagID\": \"NOQLL8OS9\",\n            \"passCharge\": 3.1\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "https://localhost:9115/api/passesCost/:tollOpID/:tagOpID/:date_from/:date_to",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Response status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test('Response has required fields', function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.include.all.keys('tollOpID', 'tagOpID', 'requestTimestamp', 'periodFrom', 'periodTo', 'nPasses', 'passesCost');",
+									"})",
+									"",
+									"pm.test('RequestTimestamp is in a valid timestamp format', function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.requestTimestamp).to.match(/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$/, 'RequestTimestamp should be in valid timestamp format');",
+									"})",
+									"",
+									"pm.test('NPasses and passesCost are non-negative integers', function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData.nPasses).to.be.a('number').and.to.be.at.least(0);",
+									"    pm.expect(responseData.passesCost).to.be.a('number').and.to.be.at.least(0);",
+									"})",
+									"",
+									"pm.test('Content-Type header is application/json', function () {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-OBSERVATORY-AUTH",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:9115/api/passesCost/AM/NO/20220101/20220109",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"passesCost",
+								"AM",
+								"NO",
+								"20220101",
+								"20220109"
+							]
+						},
+						"description": "Returns the amount of times car with a tagOpId passed from stations that belong to tollOpID and the amount of money he owns to him in a specific period of time."
+					},
+					"response": [
+						{
+							"name": "passescost_output",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-OBSERVATORY-AUTH",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:9115/api/passesCost/AM/NO/20220101/20220109",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "9115",
+									"path": [
+										"api",
+										"passesCost",
+										"AM",
+										"NO",
+										"20220101",
+										"20220109"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "150"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"96-7I5mBCSJWild2dxFjNmov42pLdM\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 05 Jan 2025 23:09:24 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"tollOpID\": \"AM\",\n    \"tagOpID\": \"NO\",\n    \"requestTimestamp\": \"2025-01-06 01:09\",\n    \"periodFrom\": \"2022-01-01\",\n    \"periodTo\": \"2022-01-09\",\n    \"nPasses\": 4,\n    \"passesCost\": 10.7\n}"
+						}
+					]
+				},
+				{
+					"name": "https://localhost:9115/api/chargesBy/:tollOpID/:date_from/:date_to",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Response status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test('Response has the required fields', function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.tollOpID).to.exist;",
+									"    pm.expect(responseData.requestTimestamp).to.exist;",
+									"    pm.expect(responseData.periodFrom).to.exist;",
+									"    pm.expect(responseData.periodTo).to.exist;",
+									"    pm.expect(responseData.vOpList).to.exist;",
+									"})",
+									"",
+									"pm.test('VOpList array is present and has expected number of elements', function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.have.property('vOpList').that.is.an('array').and.to.have.lengthOf.at.least(1);",
+									"})",
+									"",
+									"pm.test('Visiting operation ID is a non-empty string', function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.vOpList).to.be.an('array');",
+									"    responseData.vOpList.forEach(function (vOp) {",
+									"        pm.expect(vOp.visitingOpID).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Value should not be empty');",
+									"        pm.expect(vOp.nPasses).to.be.a('number').and.to.be.at.least(0, 'Value should be a non-negative integer');",
+									"        pm.expect(vOp.passesCost).to.be.a('number').and.to.be.at.least(0, 'Value should be a non-negative integer');",
+									"    });",
+									"})",
+									"",
+									"pm.test('Request timestamp is in a valid timestamp format', function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.have.property('requestTimestamp').that.is.a('string').and.matches(/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$/, 'Timestamp should be in valid format');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-OBSERVATORY-AUTH",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:9115/api/chargesBy/AM/20220101/20220109?format=csv",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"chargesBy",
+								"AM",
+								"20220101",
+								"20220109"
+							],
+							"query": [
+								{
+									"key": "format",
+									"value": "csv"
+								}
+							]
+						},
+						"description": "Returns amount of passes and money owned from every operator to the tollOpID operator"
+					},
+					"response": [
+						{
+							"name": "chargesby_output",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-OBSERVATORY-AUTH",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:9115/api/chargesBy/AM/20220101/20220109?format=csv",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "9115",
+									"path": [
+										"api",
+										"chargesBy",
+										"AM",
+										"20220101",
+										"20220109"
+									],
+									"query": [
+										{
+											"key": "format",
+											"value": "csv"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/csv; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "458"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"1ca-iqfp2sai92ZRfsooe/viV3Hi370\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 05 Jan 2025 23:10:34 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "tollOpID,requestTimestamp,periodFrom,periodTo,vOpList\nAM,2025-01-06 01:10,2022-01-01,2022-01-09,\"[{\"\"visitingOpID\"\":\"\"EG\"\",\"\"nPasses\"\":8,\"\"passesCost\"\":21.5},{\"\"visitingOpID\"\":\"\"KO\"\",\"\"nPasses\"\":3,\"\"passesCost\"\":8.6},{\"\"visitingOpID\"\":\"\"MO\"\",\"\"nPasses\"\":1,\"\"passesCost\"\":2.2},{\"\"visitingOpID\"\":\"\"NAO\"\",\"\"nPasses\"\":7,\"\"passesCost\"\":18.8},{\"\"visitingOpID\"\":\"\"NO\"\",\"\"nPasses\"\":4,\"\"passesCost\"\":10.7},{\"\"visitingOpID\"\":\"\"OO\"\",\"\"nPasses\"\":3,\"\"passesCost\"\":8.4}]\"\n"
+						}
+					]
+				}
+			],
+			"description": "Endpoints that offer various data about the toll stations and their operators"
+		},
+		{
+			"name": "https://localhost:9115/api/logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response has the required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('status');",
+							"    pm.expect(responseData).to.have.property('dbconnection');",
+							"    pm.expect(responseData).to.have.property('n_stations');",
+							"    pm.expect(responseData).to.have.property('n_tags');",
+							"    pm.expect(responseData).to.have.property('n_passes');",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status is a non-empty string\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData).to.be.an('object');",
+							"  pm.expect(responseData.status).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Status should be a non-empty string\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"N_stations, n_tags, and n_passes are non-negative integers\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData).to.be.an('object');",
+							"  pm.expect(responseData.n_stations).to.be.a('number').and.to.be.at.least(0);",
+							"  pm.expect(responseData.n_tags).to.be.a('number').and.to.be.at.least(0);",
+							"  pm.expect(responseData.n_passes).to.be.a('number').and.to.be.at.least(0);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Content-Type header is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-OBSERVATORY-AUTH",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:9115/api/logout",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "9115",
+					"path": [
+						"api",
+						"logout"
+					]
+				},
+				"description": "Logs the user out, returns 200 status code if successful and no content. Actual logging out happens in the cli/ui as its a jwt authentication keeping the api stateless."
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:9115/api/login",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"olympos\",\r\n    \"password\": \"kolomuani\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:9115/api/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "9115",
+					"path": [
+						"api",
+						"login"
+					]
+				},
+				"description": "Log into the system"
+			},
+			"response": [
+				{
+					"name": "login_output",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"freepasses4all\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:9115/api/login",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "9115",
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "169"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"a9-cH33QbfO2W+g60irO5TGxz4cJLk\""
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 05 Jan 2025 23:03:06 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE4MTg2LCJleHAiOjE3MzYyMDQ1ODZ9.65oJOoSxx82fF_vvym8MdIj4ozeKZgnBZ0wLp3TrQcY\"\n}"
+				}
+			]
+		}
+	]
+}
