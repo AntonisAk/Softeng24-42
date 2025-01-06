@@ -8,8 +8,8 @@ const {
 } = require("../controllers/authController");
 const auth = require("../middleware/auth");
 
-router.get("/users", users);
-router.post("/register", register);
+router.get("/users", auth, users);
+router.post("/register", auth, register);
 router.post("/login", login); // then the frontend should store the token in localstorage and attach it to the head of every request.
 router.post("/logout", auth, logout); // will be handled in the frontend
 

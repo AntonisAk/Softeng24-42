@@ -7,6 +7,9 @@ const register = async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    if (req.user.role !== "admin") {
+      return res.status(401).json({ error: "Not Authorized" });
+    }
     // Check if username already exists
     const userExists = await pool.query(
       "SELECT UserID FROM Users WHERE Username = $1",
@@ -44,6 +47,7 @@ const login = async (req, res) => {
     );
 
     const user = result.rows[0];
+
     if (!user) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
@@ -75,6 +79,9 @@ const logout = async (req, res) => {
 
 const users = async (req, res) => {
   try {
+    if (req.user.role !== "admin") {
+      return res.status(401).json({ error: "Not Authorized" });
+    }
     // Insert new user into the database
     const result = await pool.query("SELECT Username FROM Users");
     const usernames = result.rows.map((row) => row.username);

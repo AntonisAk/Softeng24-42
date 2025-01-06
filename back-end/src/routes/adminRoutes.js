@@ -4,6 +4,7 @@ const adminController = require("../controllers/adminController");
 const validate = require("../middleware/validate");
 const schemas = require("../utils/validation");
 const { upload } = require("../middleware/upload");
+const auth = require("../middleware/auth");
 
 router.get(
   "/healthcheck",
@@ -22,6 +23,7 @@ router.post(
 );
 router.post(
   "/addpasses",
+  auth,
   validate(schemas.formatQuery, "query"),
   upload.single("file"),
   adminController.addPasses

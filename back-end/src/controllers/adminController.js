@@ -3,6 +3,7 @@ const { importStations, importPasses } = require("../utils/dbMigrate");
 const pool = require("../config/database");
 const path = require("path");
 const { formatResponse, getContentType } = require("../utils/formatResponse");
+const bcrypt = require("bcrypt");
 
 const adminController = {
   async healthcheck(req, res) {
@@ -56,9 +57,11 @@ const adminController = {
     try {
       await Pass.deleteAllPasses();
       await pool.query("UPDATE Debts SET amount = $1", [0]);
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash("freepasses4all", salt);
       await pool.query(
         `INSERT INTO USERS (username, password, role) VALUES ($1, $2, $3)`,
-        ["admin", "freepasses4all", "admin"]
+        ["admin", hashedPassword, "admin"]
       );
       const format = req.query.format || "json";
       const response = { status: "OK" };
@@ -74,6 +77,9 @@ const adminController = {
 
   async addPasses(req, res) {
     try {
+      if (req.user.role !== "admin") {
+        return res.status(401).json({ error: "Not Authorized" });
+      }
       if (!req.file) {
         // the uplaoded file has to have key/name file in reqbody
         throw new Error("No file uploaded");
