@@ -7,6 +7,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const tollRoutes = require("./routes/tollRoutes");
 const passRoutes = require("./routes/passRoutes");
 const authRoutes = require("./routes/authRoutes");
+const usecasesRoutes = require("./routes/usecasesRoutes");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/tollStationPasses", tollRoutes);
 app.use("/api", passRoutes); // Will contain passAnalysis, passesCost, and chargesBy
 app.use("/api", authRoutes); // add the following to .env JWT_SECRET=your_jwt_secret_here
+app.use("/api", usecasesRoutes);
 
 // Error handling
 app.use(errorHandler);
