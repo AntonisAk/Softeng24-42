@@ -72,5 +72,24 @@ program
   .option('--format <format>', 'Output format (json or csv)', 'csv')
   .action(require('./commands/chargesby'));
 
-// Parse CLI arguments
+  program
+  .command('admin')
+  .description('Administrative commands')
+  .requiredOption('--addpasses <addpasses>', 'Function')
+  .requiredOption('--source <source>', 'Path to the CSV file')
+  .action(require('./commands/addpasses'));
+
+program
+  .command('usermod')
+  .description('Create or modify a user')
+  .requiredOption('--username <username>', 'Username of the user')
+  .requiredOption('--passw <password>', 'New password for the user')
+  .action(require('./commands/usermod'));
+
+program
+  .command('users')
+  .description('List all users')
+  .action(require('./commands/users'));
+
+  // Parse CLI arguments
 program.parse(process.argv);
