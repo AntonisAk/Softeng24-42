@@ -1,19 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import AuthContext from "../context/AuthContext";
 import styles from "./styles/Header.module.css";
 
-export default function Header() {
-  const { token, logout } = useAuth();
-  const navigate = useNavigate();
+function Header() {
+  const { auth, setAuth } = useContext(AuthContext);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    setShowLogoutConfirm(true);
-  };
-
-  const confirmLogout = () => {
-    logout();
+    localStorage.removeItem("token");
+    setAuth(null);
     setShowLogoutConfirm(false);
     navigate("/");
   };
@@ -21,26 +18,31 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.logo}>
-        <img
-          src="/logo.svg"
-          alt="InterPayToll Logo"
-          className={styles.logoImg}
-        />
-        <h1>InterPayToll</h1>
+        <Link to="/">
+          <img
+            src="https://cdn1.iconfinder.com/data/icons/prettycons-urban-vol-1-ultra/60/36-Parking_Toll-city_urban_building_street-64.png"
+            alt="InterPayToll"
+          />
+          <span>InterPayToll</span>
+        </Link>
       </div>
+
       <nav className={styles.nav}>
         <Link to="/">Home</Link>
-        {token ? (
+        {auth ? (
           <>
             <Link to="/debts">Debts</Link>
             <Link to="/charts">Charts</Link>
             <Link to="/map">Map</Link>
-            <button onClick={handleLogout} className={styles.logoutBtn}>
+            <button
+              onClick={() => setShowLogoutConfirm(true)}
+              className={styles.logoutButton}
+            >
               Logout
             </button>
           </>
         ) : (
-          <Link to="/login">Sign In</Link>
+          <Link to="/signin">Sign In</Link>
         )}
       </nav>
 
@@ -49,8 +51,8 @@ export default function Header() {
           <div className={styles.modalContent}>
             <h2>Confirm Logout</h2>
             <p>Are you sure you want to logout?</p>
-            <div className={styles.modalButtons}>
-              <button onClick={confirmLogout}>Yes, Logout</button>
+            <div className={styles.modalActions}>
+              <button onClick={handleLogout}>Yes, Logout</button>
               <button onClick={() => setShowLogoutConfirm(false)}>
                 Cancel
               </button>
@@ -61,3 +63,5 @@ export default function Header() {
     </header>
   );
 }
+
+export default Header;

@@ -1,8 +1,7 @@
 .footer {
-  background: #1a365d;
+  background-color: var(--neutral-800);
   color: white;
-  padding: 3rem 2rem 1rem;
-  margin-top: auto;
+  padding: var(--spacing-2xl) var(--spacing-xl);
 }
 
 .content {
@@ -10,24 +9,23 @@
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+  gap: var(--spacing-xl);
 }
 
 .section h3 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: #e2e8f0;
+  color: var(--neutral-100);
+  margin-bottom: var(--spacing-md);
 }
 
 .section p {
-  color: #a0aec0;
-  margin-bottom: 0.5rem;
+  color: var(--neutral-400);
+  margin-bottom: var(--spacing-sm);
 }
 
 .bottom {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid #2d4a77;
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--neutral-700);
   text-align: center;
-  color: #a0aec0;
+  color: var(--neutral-400);
 }

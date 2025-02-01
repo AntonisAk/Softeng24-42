@@ -4,64 +4,47 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import { useState } from "react";
+import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
+import SignIn from "./pages/SignIn";
 import Debts from "./pages/Debts";
 import Charts from "./pages/Charts";
 import Map from "./pages/Map";
-import "./App.css";
-
-const ProtectedRoute = ({ children }) => {
-  const { token } = useAuth();
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-};
+import AuthContext from "./context/AuthContext";
 
 function App() {
+  const [auth, setAuth] = useState(() => {
+    const token = localStorage.getItem("token");
+    return token ? { token } : null;
+  });
+
   return (
-    <AuthProvider>
+    <AuthContext.Provider value={{ auth, setAuth }}>
       <Router>
-        <div className="app">
-          <Header />
-          <main className="main">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/debts"
-                element={
-                  <ProtectedRoute>
-                    <Debts />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/charts"
-                element={
-                  <ProtectedRoute>
-                    <Charts />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/map"
-                element={
-                  <ProtectedRoute>
-                    <Map />
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route
+              path="signin"
+              element={!auth ? <SignIn /> : <Navigate to="/debts" />}
+            />
+            <Route
+              path="debts"
+              element={auth ? <Debts /> : <Navigate to="/signin" />}
+            />
+            <Route
+              path="charts"
+              element={auth ? <Charts /> : <Navigate to="/signin" />}
+            />
+            <Route
+              path="map"
+              element={auth ? <Map /> : <Navigate to="/signin" />}
+            />
+          </Route>
+        </Routes>
       </Router>
-    </AuthProvider>
+    </AuthContext.Provider>
   );
 }
 

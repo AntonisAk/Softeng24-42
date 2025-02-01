@@ -1,72 +1,75 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useState, useEffect, useContext } from "react";
+import AuthContext from "../context/AuthContext";
+import { apiClient } from "../api/client";
 import styles from "./styles/Debts.module.css";
 
-export default function Debts() {
-  const { token } = useAuth();
+function Debts() {
+  const { auth } = useContext(AuthContext);
   const [debts, setDebts] = useState({ owes: [], owned: [] });
-  const [paymentData, setPaymentData] = useState({
+  const [payment, setPayment] = useState({
     toOperatorId: "",
     amount: "",
   });
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState("");
 
   const fetchDebts = async () => {
     try {
-      const response = await fetch("https://localhost:9115/api/debts", {
-        headers: {
-          "X-OBSERVATORY-AUTH": token,
-        },
-      });
-      const data = await response.json();
+      const data = await apiClient.getDebts(auth.token);
       setDebts(data);
-    } catch (error) {
-      console.error("Error fetching debts:", error);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch debts. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchDebts();
-  }, [token, fetchDebts]); // Added fetchDebts to dependencies
+  }, [auth.token]);
 
-  const handlePayment = async (e) => {
+  const handlePaymentSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage("");
+    if (!payment.toOperatorId || !payment.amount) {
+      setError("Please select an operator and enter an amount");
+      return;
+    }
 
+    if (isNaN(payment.amount) || parseFloat(payment.amount) <= 0) {
+      setError("Please enter a valid amount");
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      const response = await fetch("https://localhost:9115/api/debts/pay", {
-        method: "POST",
-        headers: {
-          "X-OBSERVATORY-AUTH": token,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(paymentData),
-      });
+      const result = await apiClient.payDebt(auth.token, payment);
+      setSuccess(result.message);
+      setPayment({ toOperatorId: "", amount: "" });
+      fetchDebts(); // Refresh debts after successful payment
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage("Payment processed successfully!");
-        setPaymentData({ toOperatorId: "", amount: "" });
-        fetchDebts(); // Refresh the debts data
-      } else {
-        throw new Error(data.error || "Payment failed");
-      }
-    } catch (error) {
-      setMessage(error.message);
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccess("");
+      }, 3000);
+    } catch (err) {
+      setError(err.message || "Failed to process payment");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  return (
-    <div className={styles.debtsContainer}>
-      <h1>Debt Management</h1>
+  if (isLoading && !debts.owes.length) {
+    return <div className={styles.loading}>Loading...</div>;
+  }
 
-      <div className={styles.tablesContainer}>
-        <div className={styles.tableWrapper}>
+  return (
+    <div className={styles.debts}>
+      <h1>Debts Overview</h1>
+
+      <div className={styles.tables}>
+        <div className={styles.tableContainer}>
           <h2>Money You Owe</h2>
           <table className={styles.table}>
             <thead>
@@ -76,17 +79,24 @@ export default function Debts() {
               </tr>
             </thead>
             <tbody>
-              {debts.owes.map((debt, index) => (
-                <tr key={index}>
+              {debts.owes.map((debt) => (
+                <tr key={debt.operator}>
                   <td>{debt.operator}</td>
-                  <td>€{debt.amount}</td>
+                  <td>€{parseFloat(debt.amount).toFixed(2)}</td>
                 </tr>
               ))}
+              {debts.owes.length === 0 && (
+                <tr>
+                  <td colSpan="2" className={styles.emptyState}>
+                    No debts to show
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
 
-        <div className={styles.tableWrapper}>
+        <div className={styles.tableContainer}>
           <h2>Money Owed to You</h2>
           <table className={styles.table}>
             <thead>
@@ -96,12 +106,19 @@ export default function Debts() {
               </tr>
             </thead>
             <tbody>
-              {debts.owned.map((debt, index) => (
-                <tr key={index}>
+              {debts.owned.map((debt) => (
+                <tr key={debt.operator}>
                   <td>{debt.operator}</td>
-                  <td>€{debt.amount}</td>
+                  <td>€{parseFloat(debt.amount).toFixed(2)}</td>
                 </tr>
               ))}
+              {debts.owned.length === 0 && (
+                <tr>
+                  <td colSpan="2" className={styles.emptyState}>
+                    No money owed to you
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -109,53 +126,58 @@ export default function Debts() {
 
       <div className={styles.paymentSection}>
         <h2>Make a Payment</h2>
-        {message && (
-          <div
-            className={`${styles.message} ${
-              message.includes("success") ? styles.success : styles.error
-            }`}
-          >
-            {message}
-          </div>
-        )}
-        <form onSubmit={handlePayment} className={styles.paymentForm}>
+        <form onSubmit={handlePaymentSubmit} className={styles.paymentForm}>
           <div className={styles.formGroup}>
-            <label htmlFor="operator">Operator</label>
+            <label htmlFor="operator">Select Operator</label>
             <select
               id="operator"
-              value={paymentData.toOperatorId}
+              value={payment.toOperatorId}
               onChange={(e) =>
-                setPaymentData({ ...paymentData, toOperatorId: e.target.value })
+                setPayment((prev) => ({
+                  ...prev,
+                  toOperatorId: e.target.value,
+                }))
               }
-              required
+              disabled={isLoading}
             >
-              <option value="">Select Operator</option>
-              {debts.owes.map((debt, index) => (
-                <option key={index} value={debt.operator}>
-                  {debt.operator}
+              <option value="">Select an operator</option>
+              {debts.owes.map((debt) => (
+                <option key={debt.operator} value={debt.operator}>
+                  {debt.operator} (€{parseFloat(debt.amount).toFixed(2)})
                 </option>
               ))}
             </select>
           </div>
+
           <div className={styles.formGroup}>
-            <label htmlFor="amount">Amount</label>
+            <label htmlFor="amount">Amount (€)</label>
             <input
               type="number"
               id="amount"
               step="0.01"
               min="0.01"
-              value={paymentData.amount}
+              value={payment.amount}
               onChange={(e) =>
-                setPaymentData({ ...paymentData, amount: e.target.value })
+                setPayment((prev) => ({ ...prev, amount: e.target.value }))
               }
-              required
+              disabled={isLoading}
             />
           </div>
-          <button type="submit" disabled={loading}>
-            {loading ? "Processing..." : "Pay"}
+
+          {error && <div className={styles.error}>{error}</div>}
+          {success && <div className={styles.success}>{success}</div>}
+
+          <button
+            type="submit"
+            className={styles.payButton}
+            disabled={isLoading || !payment.toOperatorId}
+          >
+            {isLoading ? "Processing..." : "Pay Now"}
           </button>
         </form>
       </div>
     </div>
   );
 }
+
+export default Debts;

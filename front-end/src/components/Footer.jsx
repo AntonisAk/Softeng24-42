@@ -1,12 +1,12 @@
 import styles from "./styles/Footer.module.css";
 
-export default function Footer() {
+function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.content}>
         <div className={styles.section}>
           <h3>InterPayToll</h3>
-          <p>Making highway toll payments seamless and efficient.</p>
+          <p>Simplifying toll payments across highways</p>
         </div>
         <div className={styles.section}>
           <h3>Contact</h3>
@@ -20,8 +20,10 @@ export default function Footer() {
         </div>
       </div>
       <div className={styles.bottom}>
-        <p>&copy; 2024 InterPayToll. All rights reserved.</p>
+        <p>&copy; 2025 InterPayToll. All rights reserved.</p>
       </div>
     </footer>
   );
 }
+
+export default Footer;
