@@ -45,16 +45,11 @@ const getOperatorDebts = async (req, res) => {
     rows.forEach((row) => {
       const debtInfo = {
         operator: row.operatorname,
-        operatorId:
-          row.fromoperatorid === operatorId
-            ? row.tooperatorid
-            : row.fromoperatorid,
         amount: row.amountowed,
       };
-
-      if (row.type === "owes") {
+      if (row.type === "owes" && row.amountowed > 0.0) {
         formattedDebts.owes.push(debtInfo);
-      } else {
+      } else if (row.type === "owned" && row.amountowed > 0.0) {
         formattedDebts.owned.push(debtInfo);
       }
     });

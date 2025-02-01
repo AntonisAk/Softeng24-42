@@ -174,7 +174,7 @@ class Debt {
             [debt.op1, debt.op2, 0]
           );
         } else {
-          // Debts cancel out - delete both records
+          // Debts cancel out -
           await pool.query(
             `UPDATE Debts 
              SET Amount = $3
