@@ -1,0 +1,15 @@
+.chartsContainer {
+  max-width: 1200px;
+  margin: 6rem auto 2rem;
+  padding: 0 2rem;
+  text-align: center;
+}
+
+.chartsContainer h1 {
+  color: #1a365d;
+  margin-bottom: 1rem;
+}
+
+.chartsContainer p {
+  color: #4a5568;
+}

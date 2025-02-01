@@ -1,0 +1,15 @@
+.mapContainer {
+  max-width: 1200px;
+  margin: 6rem auto 2rem;
+  padding: 0 2rem;
+  text-align: center;
+}
+
+.mapContainer h1 {
+  color: #1a365d;
+  margin-bottom: 1rem;
+}
+
+.mapContainer p {
+  color: #4a5568;
+}
