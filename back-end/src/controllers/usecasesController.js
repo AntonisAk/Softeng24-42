@@ -141,7 +141,99 @@ const processPayment = async (req, res) => {
   }
 };
 
+const getCrossOperatorStats = async (req, res, next) => {
+  const { opid } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      WITH CrossOperatorPasses AS (
+        SELECT 
+          EXTRACT(YEAR FROM p.timestamp) as year,
+          p.tagHomeID,
+          o.Name as operator_name,
+          COUNT(*) as passes,
+          SUM(p.charge) as revenue
+        FROM Passes p
+        JOIN Tollstations t ON p.TollID = t.TollID
+        JOIN Operators o ON p.tagHomeID = o.OperatorID
+        WHERE t.OperatorID = $1
+          AND p.tagHomeID != t.OperatorID
+        GROUP BY 
+          EXTRACT(YEAR FROM p.timestamp),
+          p.tagHomeID,
+          o.Name
+        ORDER BY year, p.tagHomeID
+      )
+      SELECT 
+        year,
+        json_agg(
+          json_build_object(
+            'operator', operator_name,
+            'opid', tagHomeID,
+            'passes', passes,
+            'revenue', revenue
+          )
+        ) as data
+      FROM CrossOperatorPasses
+      GROUP BY year
+      ORDER BY year;
+    `,
+      [opid]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getTrafficStats = async (req, res, next) => {
+  try {
+    const result = await pool.query(`
+      WITH MonthlyStats AS (
+        SELECT 
+          EXTRACT(YEAR FROM p.timestamp) as year,
+          EXTRACT(MONTH FROM p.timestamp) as month,
+          t.OperatorID,
+          o.Name as operator_name,
+          COUNT(*) as passes,
+          SUM(p.charge) as revenue
+        FROM Passes p
+        JOIN Tollstations t ON p.TollID = t.TollID
+        JOIN Operators o ON t.OperatorID = o.OperatorID
+        GROUP BY 
+          EXTRACT(YEAR FROM p.timestamp),
+          EXTRACT(MONTH FROM p.timestamp),
+          t.OperatorID,
+          o.Name
+        ORDER BY year, month, t.OperatorID
+      )
+      SELECT 
+        year,
+        json_agg(
+          json_build_object(
+            'month', month,
+            'operator', operator_name,
+            'opid', OperatorID,
+            'passes', passes,
+            'revenue', revenue
+          ) ORDER BY month, OperatorID
+        ) as data
+      FROM MonthlyStats
+      GROUP BY year
+      ORDER BY year;
+    `);
+
+    res.json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getOperatorDebts,
   processPayment,
+  getCrossOperatorStats,
+  getTrafficStats,
 };
