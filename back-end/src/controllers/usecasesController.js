@@ -45,6 +45,10 @@ const getOperatorDebts = async (req, res) => {
     rows.forEach((row) => {
       const debtInfo = {
         operator: row.operatorname,
+        opId:
+          row.fromoperatorid === operatorId
+            ? row.tooperatorid
+            : row.fromoperatorid,
         amount: row.amountowed,
       };
       if (row.type === "owes" && row.amountowed > 0.0) {

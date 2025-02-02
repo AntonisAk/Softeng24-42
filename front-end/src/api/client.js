@@ -45,9 +45,11 @@ export const apiClient = {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || "Failed to process payment");
+      if (error.error && error.currentDebt) {
+        throw { error: error.error, currentDebt: error.currentDebt };
+      }
+      throw new Error(error || "Failed to process payment");
     }
-
     return response.json();
   },
 };

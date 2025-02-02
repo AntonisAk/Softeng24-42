@@ -20,6 +20,7 @@ function Debts() {
       setDebts(data);
       setError(null);
     } catch (err) {
+      console.log(err.message);
       setError("Failed to fetch debts. Please try again.");
     } finally {
       setIsLoading(false);
@@ -28,6 +29,7 @@ function Debts() {
 
   useEffect(() => {
     fetchDebts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.token]);
 
   const handlePaymentSubmit = async (e) => {
@@ -45,6 +47,7 @@ function Debts() {
     setIsLoading(true);
     try {
       const result = await apiClient.payDebt(auth.token, payment);
+      console.log(result);
       setSuccess(result.message);
       setPayment({ toOperatorId: "", amount: "" });
       fetchDebts(); // Refresh debts after successful payment
@@ -54,7 +57,7 @@ function Debts() {
         setSuccess("");
       }, 3000);
     } catch (err) {
-      setError(err.message || "Failed to process payment");
+      setError(err.error || "Failed to process payment");
     } finally {
       setIsLoading(false);
     }
@@ -142,7 +145,7 @@ function Debts() {
             >
               <option value="">Select an operator</option>
               {debts.owes.map((debt) => (
-                <option key={debt.operator} value={debt.operator}>
+                <option key={debt.operator} value={debt.opId}>
                   {debt.operator} (€{parseFloat(debt.amount).toFixed(2)})
                 </option>
               ))}
