@@ -1,4 +1,5 @@
 const pool = require("../config/database");
+const { Operator } = require("../models");
 
 const getOperatorDebts = async (req, res) => {
   const client = await pool.connect();
@@ -231,9 +232,15 @@ const getTrafficStats = async (req, res, next) => {
   }
 };
 
+const getOperators = async (req, res) => {
+  const operators = await Operator.getAllOperators();
+  res.json(operators);
+};
+
 module.exports = {
   getOperatorDebts,
   processPayment,
   getCrossOperatorStats,
   getTrafficStats,
+  getOperators,
 };
