@@ -17,7 +17,15 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
+const COLORS = [
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "#8884d8",
+  "#D88484",
+  "#32CD32",
+];
 
 const Charts = () => {
   const { auth } = useContext(AuthContext);
@@ -193,10 +201,10 @@ const Charts = () => {
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         {/* Pie Chart */}
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">
+          <h2 className="text-xl font-semibold mb-6">
             Cross-Operator Transactions for{" "}
             {operators.find((op) => op.operatorid === selectedOperator)?.name}
           </h2>
