@@ -52,4 +52,46 @@ export const apiClient = {
     }
     return response.json();
   },
+
+  async getOperators(token) {
+    const response = await fetch(`${BASE_URL}/operators`, {
+      headers: {
+        "X-OBSERVATORY-AUTH": token,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch cross-operator data");
+    }
+
+    return response.json();
+  },
+
+  async getCrossOpData(token, opId) {
+    const response = await fetch(`${BASE_URL}/crossop/${opId}`, {
+      headers: {
+        "X-OBSERVATORY-AUTH": token,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch cross-operator data");
+    }
+
+    return response.json();
+  },
+
+  async getTrafficData(token) {
+    const response = await fetch(`${BASE_URL}/traffic`, {
+      headers: {
+        "X-OBSERVATORY-AUTH": token,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch traffic data");
+    }
+
+    return response.json();
+  },
 };

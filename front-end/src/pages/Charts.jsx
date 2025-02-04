@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import AuthContext from "../context/AuthContext";
+import { apiClient } from "../api/client";
 import {
   PieChart,
   Pie,
@@ -8,213 +9,270 @@ import {
   Bar,
   XAxis,
   YAxis,
-  Tooltip,
-  Legend,
   LineChart,
   Line,
   CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
-import styles from "./styles/Charts.module.css";
 
-function Charts() {
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
+
+const Charts = () => {
   const { auth } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Data states
   const [operators, setOperators] = useState([]);
-  const [selectedOperator, setSelectedOperator] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
-  const [dataType, setDataType] = useState("passes"); // "passes" or "revenue"
   const [crossOpData, setCrossOpData] = useState([]);
   const [trafficData, setTrafficData] = useState([]);
-  const [years, setYears] = useState([]);
 
-  // Fetch operators
+  // Filter states
+  const [selectedOperator, setSelectedOperator] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [showPasses, setShowPasses] = useState(true);
+
+  // Derived data
+  const availableYears = [
+    ...new Set([
+      ...(crossOpData.map((d) => d.year) || []),
+      ...(trafficData.map((d) => d.year) || []),
+    ]),
+  ].sort();
+
   useEffect(() => {
-    const fetchOperators = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await fetch("https://localhost:9115/api/operators", {
-          headers: {
-            "X-OBSERVATORY-AUTH": auth.token,
-          },
-        });
-        const data = await response.json();
-        setOperators(data);
-        if (data.length > 0) setSelectedOperator(data[0].operatorid);
-      } catch (error) {
-        console.error("Error fetching operators:", error);
+        const [operatorsData, trafficResult] = await Promise.all([
+          apiClient.getOperators(auth.token),
+          apiClient.getTrafficData(auth.token),
+        ]);
+
+        setOperators(operatorsData);
+        setTrafficData(trafficResult);
+
+        if (operatorsData.length > 0) {
+          setSelectedOperator(operatorsData[0].operatorid);
+        }
+
+        if (trafficResult.length > 0) {
+          setSelectedYear(trafficResult[0].year);
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchOperators();
+
+    fetchInitialData();
   }, [auth.token]);
 
-  // Fetch cross-operator data
   useEffect(() => {
-    if (!selectedOperator || !selectedYear) return;
     const fetchCrossOpData = async () => {
-      try {
-        const response = await fetch(
-          `https://localhost:9115/api/crossop/${selectedOperator}`,
-          {
-            headers: {
-              "X-OBSERVATORY-AUTH": auth.token,
-            },
-          }
-        );
-        const data = await response.json();
-        const yearData = data.find((item) => item.year === selectedYear);
-        setCrossOpData(yearData ? yearData.data : []);
-      } catch (error) {
-        console.error("Error fetching cross-operator data:", error);
+      if (selectedOperator) {
+        try {
+          const data = await apiClient.getCrossOpData(
+            auth.token,
+            selectedOperator
+          );
+          setCrossOpData(data);
+        } catch (err) {
+          setError(err.message);
+        }
       }
     };
+
     fetchCrossOpData();
-  }, [auth.token, selectedOperator, selectedYear]);
+  }, [selectedOperator, auth.token]);
 
-  // Fetch traffic data
-  useEffect(() => {
-    if (!selectedYear) return;
-    const fetchTrafficData = async () => {
-      try {
-        const response = await fetch("https://localhost:9115/api/traffic", {
-          headers: {
-            "X-OBSERVATORY-AUTH": auth.token,
-          },
-        });
-        const data = await response.json();
-        const yearData = data.find((item) => item.year === selectedYear);
-        setTrafficData(yearData ? yearData.data : []);
-        // Extract unique years for dropdown
-        const uniqueYears = [...new Set(data.map((item) => item.year))];
-        setYears(uniqueYears);
-        if (uniqueYears.length > 0 && !selectedYear)
-          setSelectedYear(uniqueYears[0]);
-      } catch (error) {
-        console.error("Error fetching traffic data:", error);
-      }
-    };
-    fetchTrafficData();
-  }, [auth.token, selectedYear]);
-
-  // Prepare data for charts
-  const pieChartData = crossOpData.map((item) => ({
-    name: item.operator,
-    value: item[dataType],
-  }));
-
-  const barChartData = Object.values(
-    trafficData.reduce((acc, item) => {
-      if (!acc[item.opid]) {
-        acc[item.opid] = { operator: item.operator, passes: 0, revenue: 0 };
-      }
-      acc[item.opid].passes += item.passes;
-      acc[item.opid].revenue += item.revenue;
-      return acc;
-    }, {})
-  );
-
-  const lineChartData = Array.from({ length: 12 }, (_, i) => {
-    const monthData = trafficData.filter(
-      (item) => item.month === i + 1 && item.opid === selectedOperator
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl">Loading charts...</div>
+      </div>
     );
-    return {
-      month: i + 1,
-      passes: monthData.reduce((sum, item) => sum + item.passes, 0),
-      revenue: monthData.reduce((sum, item) => sum + item.revenue, 0),
-    };
-  });
 
-  // Colors for charts
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
+  if (error)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl text-red-500">Error: {error}</div>
+      </div>
+    );
+
+  // Get pie chart data for selected year
+  const getPieChartData = () => {
+    const yearData =
+      crossOpData.find((d) => d.year === selectedYear)?.data || [];
+    return yearData.map((d) => ({
+      name: d.operator,
+      value: showPasses ? d.passes : d.revenue,
+    }));
+  };
+
+  // Get bar chart data for selected year
+  const getBarChartData = () => {
+    const yearData =
+      trafficData.find((d) => d.year === selectedYear)?.data || [];
+    const aggregatedData = {};
+
+    yearData.forEach((d) => {
+      if (!aggregatedData[d.operator]) {
+        aggregatedData[d.operator] = {
+          operator: d.operator,
+          passes: 0,
+          revenue: 0,
+        };
+      }
+      aggregatedData[d.operator].passes += d.passes;
+      aggregatedData[d.operator].revenue += d.revenue;
+    });
+
+    return Object.values(aggregatedData);
+  };
+
+  // Get line chart data for selected operator and year
+  const getLineChartData = () => {
+    const yearData =
+      trafficData.find((d) => d.year === selectedYear)?.data || [];
+    return yearData
+      .filter((d) => d.opid === selectedOperator)
+      .sort((a, b) => a.month - b.month)
+      .map((d) => ({
+        month: `Month ${d.month}`,
+        value: showPasses ? d.passes : d.revenue,
+      }));
+  };
 
   return (
-    <div className={styles.chartsPage}>
-      <h1>Charts</h1>
-      <div className={styles.filters}>
-        <label>
-          Operator:
-          <select
-            value={selectedOperator}
-            onChange={(e) => setSelectedOperator(e.target.value)}
-          >
-            {operators.map((op) => (
-              <option key={op.operatorid} value={op.operatorid}>
-                {op.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Year:
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-          >
-            {years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Data Type:
-          <select
-            value={dataType}
-            onChange={(e) => setDataType(e.target.value)}
-          >
-            <option value="passes">Passes</option>
-            <option value="revenue">Revenue</option>
-          </select>
-        </label>
+    <div className="p-8 space-y-8">
+      {/* Controls */}
+      <div className="flex flex-wrap gap-4 mb-8">
+        <select
+          className="px-4 py-2 border rounded"
+          value={selectedOperator}
+          onChange={(e) => setSelectedOperator(e.target.value)}
+        >
+          {operators.map((op) => (
+            <option key={op.operatorid} value={op.operatorid}>
+              {op.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="px-4 py-2 border rounded"
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+        >
+          {availableYears.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+
+        <button
+          className={`px-4 py-2 rounded ${
+            showPasses ? "bg-blue-500 text-white" : "bg-gray-200"
+          }`}
+          onClick={() => setShowPasses(true)}
+        >
+          Show Passes
+        </button>
+        <button
+          className={`px-4 py-2 rounded ${
+            !showPasses ? "bg-blue-500 text-white" : "bg-gray-200"
+          }`}
+          onClick={() => setShowPasses(false)}
+        >
+          Show Revenue
+        </button>
       </div>
 
-      <div className={styles.chartContainer}>
-        <h2>Cross-Operator Pass Transactions</h2>
-        <PieChart width={400} height={400}>
-          <Pie
-            data={pieChartData}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={150}
-            fill="#8884d8"
-            label
-          >
-            {pieChartData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Pie Chart */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">
+            Cross-Operator Transactions for{" "}
+            {operators.find((op) => op.operatorid === selectedOperator)?.name}
+          </h2>
+          <ResponsiveContainer width="100%" height={400}>
+            <PieChart>
+              <Pie
+                data={getPieChartData()}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={150}
+                label
+              >
+                {getPieChartData().map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Bar Chart */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">
+            Total Transactions by Operator
+          </h2>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart
+              data={getBarChartData()}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="operator" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey={showPasses ? "passes" : "revenue"} fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Line Chart */}
+        <div className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+          <h2 className="text-xl font-semibold mb-4">
+            Monthly Transactions for{" "}
+            {operators.find((op) => op.operatorid === selectedOperator)?.name}
+          </h2>
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart
+              data={getLineChartData()}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="value"
+                name={showPasses ? "Passes" : "Revenue"}
+                stroke="#8884d8"
+                activeDot={{ r: 8 }}
               />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h2>All Pass Transactions Through Operators</h2>
-        <BarChart width={600} height={400} data={barChartData}>
-          <XAxis dataKey="operator" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey={dataType} fill="#8884d8" />
-        </BarChart>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h2>Monthly Pass Transactions Through Operator</h2>
-        <LineChart width={600} height={400} data={lineChartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey={dataType} stroke="#8884d8" />
-        </LineChart>
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default Charts;
