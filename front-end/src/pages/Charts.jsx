@@ -16,6 +16,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import styles from "./styles/Charts.module.css";
 
 const COLORS = [
   "#0088FE",
@@ -23,8 +24,8 @@ const COLORS = [
   "#FFBB28",
   "#FF8042",
   "#8884d8",
-  "#D88484",
   "#32CD32",
+  "#D88484",
 ];
 
 const Charts = () => {
@@ -98,15 +99,15 @@ const Charts = () => {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl">Loading charts...</div>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingText}>Loading charts...</div>
       </div>
     );
 
   if (error)
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl text-red-500">Error: {error}</div>
+      <div className={styles.errorContainer}>
+        <div className={styles.errorText}>Error: {error}</div>
       </div>
     );
 
@@ -155,11 +156,11 @@ const Charts = () => {
   };
 
   return (
-    <div className="p-8 space-y-8">
+    <div className={styles.container}>
       {/* Controls */}
-      <div className="flex flex-wrap gap-4 mb-8">
+      <div className={styles.controls}>
         <select
-          className="px-4 py-2 border rounded"
+          className={styles.select}
           value={selectedOperator}
           onChange={(e) => setSelectedOperator(e.target.value)}
         >
@@ -171,7 +172,7 @@ const Charts = () => {
         </select>
 
         <select
-          className="px-4 py-2 border rounded"
+          className={styles.select}
           value={selectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
         >
@@ -182,33 +183,45 @@ const Charts = () => {
           ))}
         </select>
 
-        <button
-          className={`px-4 py-2 rounded ${
-            showPasses ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-          onClick={() => setShowPasses(true)}
-        >
-          Show Passes
-        </button>
-        <button
-          className={`px-4 py-2 rounded ${
-            !showPasses ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-          onClick={() => setShowPasses(false)}
-        >
-          Show Revenue
-        </button>
+        <div className={styles.toggleContainer}>
+          <span
+            className={`${styles.toggleLabel} ${
+              !showPasses ? styles.active : ""
+            }`}
+          >
+            Revenue
+          </span>
+          <button
+            className={styles.toggle}
+            onClick={() => setShowPasses(!showPasses)}
+            role="switch"
+            aria-checked={showPasses}
+          >
+            <span
+              className={`${styles.toggleSlider} ${
+                showPasses ? styles.checked : ""
+              }`}
+            />
+          </button>
+          <span
+            className={`${styles.toggleLabel} ${
+              showPasses ? styles.active : ""
+            }`}
+          >
+            Passes
+          </span>
+        </div>
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 gap-8">
+      <div className={styles.chartsContainer}>
         {/* Pie Chart */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-6">
+        <div className={styles.chartCard}>
+          <h2 className={styles.chartTitle}>
             Cross-Operator Transactions for{" "}
             {operators.find((op) => op.operatorid === selectedOperator)?.name}
           </h2>
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={500}>
             <PieChart>
               <Pie
                 data={getPieChartData()}
@@ -233,11 +246,9 @@ const Charts = () => {
         </div>
 
         {/* Bar Chart */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">
-            Total Transactions by Operator
-          </h2>
-          <ResponsiveContainer width="100%" height={400}>
+        <div className={styles.chartCard}>
+          <h2 className={styles.chartTitle}>Total Transactions by Operator</h2>
+          <ResponsiveContainer width="100%" height={500}>
             <BarChart
               data={getBarChartData()}
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -253,12 +264,12 @@ const Charts = () => {
         </div>
 
         {/* Line Chart */}
-        <div className="bg-white p-6 rounded-lg shadow lg:col-span-2">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className={styles.chartCard}>
+          <h2 className={styles.chartTitle}>
             Monthly Transactions for{" "}
             {operators.find((op) => op.operatorid === selectedOperator)?.name}
           </h2>
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={500}>
             <LineChart
               data={getLineChartData()}
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
