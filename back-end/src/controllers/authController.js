@@ -8,7 +8,7 @@ const register = async (req, res) => {
 
   try {
     if (req.user.role !== "admin") {
-      return res.status(401).json({ error: "Not Authorized" });
+      return res.status(401).json({ error: "Not Authorized, only for admin" });
     }
     // Check if username already exists
     const userExists = await pool.query(
@@ -80,7 +80,7 @@ const logout = async (req, res) => {
 const users = async (req, res) => {
   try {
     if (req.user.role !== "admin") {
-      return res.status(401).json({ error: "Not Authorized" });
+      return res.status(401).json({ error: "Not Authorized, only for admin" });
     }
     // Insert new user into the database
     const result = await pool.query("SELECT Username FROM Users");

@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const auth = async (req, res, next) => {
   try {
     const token = req.header("X-OBSERVATORY-AUTH");
+    console.log(req.headers);
     if (!token) {
       return res.status(401).json({ error: "Not authorized" });
     }

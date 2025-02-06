@@ -78,7 +78,9 @@ const adminController = {
   async addPasses(req, res) {
     try {
       if (req.user.role !== "admin") {
-        return res.status(401).json({ error: "Not Authorized" });
+        return res
+          .status(401)
+          .json({ error: "Not Authorized, only for admin" });
       }
       if (!req.file) {
         // the uplaoded file has to have key/name file in reqbody

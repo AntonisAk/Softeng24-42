@@ -62,7 +62,8 @@ async function createTables() {
         tagRef VARCHAR(20) NOT NULL,
         tagHomeID VARCHAR(10) NOT NULL,
         charge DECIMAL(10,2) NOT NULL,
-        CONSTRAINT valid_charge CHECK (charge >= 0)
+        CONSTRAINT valid_charge CHECK (charge >= 0),
+        CONSTRAINT unique_pass UNIQUE (timestamp, TollID, tagRef, tagHomeID)
       );
     `);
 
@@ -179,7 +180,8 @@ async function importPasses(filePath) {
           record.charge,
         ]
       );
-
+      // the following is very inefficient, will be executed for every record
+      // either add indexes or change logic
       if (tollOperatorId !== record.tagHomeID) {
         await Debt.updateDebtFromPass(
           tollOperatorId,
