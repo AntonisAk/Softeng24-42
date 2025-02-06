@@ -3,6 +3,7 @@ const { Debt } = require("../models");
 const fs = require("fs");
 const path = require("path");
 const { parse } = require("csv-parse/sync");
+const createIndexes = require("./createIndexes");
 
 async function createTables() {
   const client = await pool.connect();
@@ -77,6 +78,9 @@ async function createTables() {
         CONSTRAINT valid_amount CHECK (Amount >= 0)
       );
     `);
+
+    // Create indexes
+    await createIndexes();
 
     await client.query("COMMIT");
     console.log("Tables created successfully");

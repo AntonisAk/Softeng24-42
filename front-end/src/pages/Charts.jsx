@@ -28,6 +28,28 @@ const COLORS = [
   "#D88484",
 ];
 
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+const formatValue = (value, showPasses) => {
+  if (!showPasses) {
+    return `€${value.toLocaleString()}`;
+  }
+  return value.toLocaleString();
+};
+
 const Charts = () => {
   const { auth } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
@@ -150,7 +172,7 @@ const Charts = () => {
       .filter((d) => d.opid === selectedOperator)
       .sort((a, b) => a.month - b.month)
       .map((d) => ({
-        month: `Month ${d.month}`,
+        month: `${MONTHS[d.month - 1]}`,
         value: showPasses ? d.passes : d.revenue,
       }));
   };
@@ -230,7 +252,7 @@ const Charts = () => {
                 cx="50%"
                 cy="50%"
                 outerRadius={150}
-                label
+                label={({ value }) => formatValue(value, showPasses)}
               >
                 {getPieChartData().map((entry, index) => (
                   <Cell
@@ -239,27 +261,9 @@ const Charts = () => {
                   />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip formatter={(value) => formatValue(value, showPasses)} />
               <Legend />
             </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Bar Chart */}
-        <div className={styles.chartCard}>
-          <h2 className={styles.chartTitle}>Total Transactions by Operator</h2>
-          <ResponsiveContainer width="100%" height={500}>
-            <BarChart
-              data={getBarChartData()}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="operator" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey={showPasses ? "passes" : "revenue"} fill="#8884d8" />
-            </BarChart>
           </ResponsiveContainer>
         </div>
 
@@ -276,8 +280,10 @@ const Charts = () => {
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
+              <YAxis
+                tickFormatter={(value) => formatValue(value, showPasses)}
+              />
+              <Tooltip formatter={(value) => formatValue(value, showPasses)} />
               <Legend />
               <Line
                 type="monotone"
@@ -287,6 +293,26 @@ const Charts = () => {
                 activeDot={{ r: 8 }}
               />
             </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Bar Chart */}
+        <div className={styles.chartCard}>
+          <h2 className={styles.chartTitle}>Total Transactions by Operator</h2>
+          <ResponsiveContainer width="100%" height={500}>
+            <BarChart
+              data={getBarChartData()}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="operator" />
+              <YAxis
+                tickFormatter={(value) => formatValue(value, showPasses)}
+              />
+              <Tooltip formatter={(value) => formatValue(value, showPasses)} />
+              <Legend />
+              <Bar dataKey={showPasses ? "passes" : "revenue"} fill="#8884d8" />
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
