@@ -169,7 +169,8 @@ async function importPasses(filePath) {
 
       await client.query(
         `INSERT INTO Passes (timestamp, TollID, tagRef, tagHomeID, charge)
-         VALUES ($1, $2, $3, $4, $5)`,
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (timestamp, TollID, tagRef, tagHomeID) DO NOTHING`, // to avoid duplicate insertions
         [
           record.timestamp,
           record.tollID,
