@@ -5,7 +5,7 @@ function Home() {
     <div className={styles.home}>
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <h1>Seemless Toll Payment Solutions</h1>
+          <h1>Seamless Toll Payment Solutions</h1>
           <p>
             Manage and track your highway toll payments across multiple
             operators with ease and efficiency.
