@@ -237,10 +237,90 @@ const getOperators = async (req, res) => {
   res.json(operators);
 };
 
+const getOperatorsWithStations = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    // Step 1: Get all operators and their toll stations
+    const { rows: operatorsWithStations } = await client.query(`
+      SELECT 
+        o.OperatorID,
+        o.Name as OperatorName,
+        json_agg(
+          json_build_object(
+            'TollID', t.TollID,
+            'Name', t.Name,
+            'Lat', t.Lat,
+            'Long', t.Long
+          )
+        ) AS TollStations
+      FROM Operators o
+      LEFT JOIN Tollstations t ON o.OperatorID = t.OperatorID
+      GROUP BY o.OperatorID, o.Name
+      ORDER BY o.Name;
+    `);
+
+    // Step 2: Find the user's operator
+    const { rows: operatorRows } = await client.query(
+      `SELECT OperatorID FROM Operators WHERE Name = $1`,
+      [req.user.username]
+    );
+
+    if (operatorRows.length === 0) {
+      return res.status(404).json({ error: "Operator not found" });
+    }
+
+    const userOperatorId = operatorRows[0].operatorid;
+
+    // Step 3: Get passes through each of the user's operator's toll stations
+    const { rows: incomingPasses } = await client.query(`
+      SELECT 
+        p.TollID,
+        t.Name AS TollStationName,
+        COUNT(*) AS TotalPasses,
+        SUM(p.charge) AS TotalRevenue
+      FROM Passes p
+      JOIN Tollstations t ON p.TollID = t.TollID
+      WHERE t.OperatorID = $1
+      GROUP BY p.TollID, t.Name
+      ORDER BY TotalPasses DESC;
+    `, [userOperatorId]);
+
+    // Step 4: Get passes of the user's operator through other operators' toll stations
+    const { rows: outgoingPasses } = await client.query(`
+      SELECT 
+        p.TollID,
+        t.Name AS TollStationName,
+        COUNT(*) AS TotalPasses,
+        SUM(p.charge) AS TotalRevenue
+      FROM Passes p
+      JOIN Tollstations t ON p.TollID = t.TollID
+      WHERE p.TagHomeID = $1 AND t.OperatorID != $1
+      GROUP BY p.TollID, t.Name
+      ORDER BY TotalPasses DESC;
+    `, [userOperatorId]);
+
+    // Step 5: Send the complete response
+    res.json({
+      operatorsWithStations, // Original data (operators & toll stations)
+      userOperatorId,
+      incomingPasses, // Passes through each of user's operator's toll stations
+      outgoingPasses, // User's operator's passes through other toll stations
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
+  }
+};
+
+
+
 module.exports = {
   getOperatorDebts,
   processPayment,
   getCrossOperatorStats,
   getTrafficStats,
   getOperators,
+  getOperatorsWithStations,
 };

@@ -61,7 +61,21 @@ export const apiClient = {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch cross-operator data");
+      throw new Error("Failed to fetch operators");
+    }
+
+    return response.json();
+  },
+
+  async getOperatorsWithStations(token) {
+    const response = await fetch(`${BASE_URL}/operators-with-stations`, {
+      headers: {
+        "X-OBSERVATORY-AUTH": token,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch operators with toll stations");
     }
 
     return response.json();
