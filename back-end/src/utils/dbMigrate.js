@@ -3,7 +3,6 @@ const { Debt } = require("../models");
 const fs = require("fs");
 const path = require("path");
 const { parse } = require("csv-parse/sync");
-const createIndexes = require("./createIndexes");
 
 async function createTables() {
   const client = await pool.connect();
@@ -78,9 +77,6 @@ async function createTables() {
         CONSTRAINT valid_amount CHECK (Amount >= 0)
       );
     `);
-
-    // Create indexes
-    await createIndexes();
 
     await client.query("COMMIT");
     console.log("Tables created successfully");
@@ -164,36 +160,20 @@ async function importPasses(filePath) {
   try {
     await client.query("BEGIN");
 
-    for (const record of records) {
-      const stationResult = await client.query(
-        `SELECT OperatorID FROM Tollstations WHERE TollID = $1`,
-        [record.tollID]
-      );
+    const passValues = records
+      .map(
+        (r) =>
+          `('${r.timestamp}', '${r.tollID}', '${r.tagRef}', '${r.tagHomeID}', ${r.charge})`
+      )
+      .join(",");
 
-      const tollOperatorId = stationResult.rows[0].operatorid;
+    await client.query(`
+      INSERT INTO Passes (timestamp, TollID, tagRef, tagHomeID, charge)
+      VALUES ${passValues}
+      ON CONFLICT (timestamp, TollID, tagRef, tagHomeID) DO NOTHING;
+    `);
 
-      await client.query(
-        `INSERT INTO Passes (timestamp, TollID, tagRef, tagHomeID, charge)
-         VALUES ($1, $2, $3, $4, $5)
-         ON CONFLICT (timestamp, TollID, tagRef, tagHomeID) DO NOTHING`, // to avoid duplicate insertions
-        [
-          record.timestamp,
-          record.tollID,
-          record.tagRef,
-          record.tagHomeID,
-          record.charge,
-        ]
-      );
-      // the following is very inefficient, will be executed for every record
-      // either add indexes or change logic
-      if (tollOperatorId !== record.tagHomeID) {
-        await Debt.updateDebtFromPass(
-          tollOperatorId,
-          record.tagHomeID,
-          record.charge
-        );
-      }
-    }
+    await Debt.updateDebtFromPass(records);
 
     await Debt.reconcileDebts();
 

@@ -99,27 +99,39 @@ class Operator {
 }
 
 class Debt {
-  static async updateDebtFromPass(tollOperatorId, tagOperatorId, charge) {
+  static async updateDebtFromPass(passRecords) {
     try {
-      // Update existing debt
-      await pool.query(
-        `UPDATE Debts 
-           SET Amount = Amount + $3 
-           WHERE FromOperatorID = $1 AND ToOperatorID = $2`,
-        [tagOperatorId, tollOperatorId, charge]
-      );
+      const updateQuery = `
+        WITH new_passes AS (
+          SELECT 
+            t.OperatorID as toll_operator_id,
+            p.tagHomeID,
+            p.charge
+          FROM UNNEST ($1::varchar[], $2::varchar[], $3::decimal[]) 
+            AS p(tollID, tagHomeID, charge)
+          JOIN Tollstations t ON t.TollID = p.tollID
+          WHERE t.OperatorID != p.tagHomeID
+        )
+        UPDATE Debts d
+        SET Amount = d.Amount + pass_totals.total_charge
+        FROM (
+          SELECT 
+            tagHomeID as from_operator,
+            toll_operator_id as to_operator,
+            SUM(charge) as total_charge
+          FROM new_passes
+          GROUP BY tagHomeID, toll_operator_id
+        ) pass_totals
+        WHERE 
+          d.FromOperatorID = pass_totals.from_operator 
+          AND d.ToOperatorID = pass_totals.to_operator`;
 
-      // Add logging to debug
-      /*
-      const result = await pool.query(
-        `SELECT Amount FROM Debts 
-         WHERE FromOperatorID = $1 AND ToOperatorID = $2`,
-        [tagOperatorId, tollOperatorId]
-      );
-      console.log(
-        `Updated debt from ${tagOperatorId} to ${tollOperatorId} with charge ${charge}. New amount: ${result.rows[0]?.Amount}`
-      );
-      */
+      // Extract arrays for the query parameters
+      const tollIds = passRecords.map((r) => r.tollID);
+      const tagHomeIds = passRecords.map((r) => r.tagHomeID);
+      const charges = passRecords.map((r) => r.charge);
+
+      await pool.query(updateQuery, [tollIds, tagHomeIds, charges]);
     } catch (error) {
       throw error;
     }
@@ -127,63 +139,37 @@ class Debt {
 
   static async reconcileDebts() {
     try {
-      // Find all pairs of operators with mutual debts
-      const mutualDebts = await pool.query(`
-        SELECT 
-          d1.FromOperatorID as op1,
-          d1.ToOperatorID as op2,
-          d1.Amount as op1_owes_op2,
-          d2.Amount as op2_owes_op1
-        FROM Debts d1
-        JOIN Debts d2 ON 
-          d1.FromOperatorID = d2.ToOperatorID AND
-          d1.ToOperatorID = d2.FromOperatorID
-        WHERE d1.FromOperatorID < d2.FromOperatorID
+      await pool.query(`
+        WITH mutual_debts AS (
+          SELECT 
+            d1.FromOperatorID as op1,
+            d1.ToOperatorID as op2,
+            d1.Amount as op1_owes_op2,
+            d2.Amount as op2_owes_op1,
+            d1.Amount - d2.Amount AS netAmount
+          FROM Debts d1
+          JOIN Debts d2 ON 
+            d1.FromOperatorID = d2.ToOperatorID AND
+            d1.ToOperatorID = d2.FromOperatorID
+          WHERE d1.FromOperatorID < d2.FromOperatorID
+      )
+      UPDATE Debts
+      SET Amount = CASE 
+          -- When op1 owes more to op2
+          WHEN (Debts.FromOperatorID = mutual_debts.op1 AND 
+                Debts.ToOperatorID = mutual_debts.op2 AND 
+                netAmount > 0) THEN netAmount
+          -- When op2 owes more to op1
+          WHEN (Debts.FromOperatorID = mutual_debts.op2 AND 
+                Debts.ToOperatorID = mutual_debts.op1 AND 
+                netAmount < 0) THEN ABS(netAmount)
+          -- All other cases (including when debts cancel out)
+          ELSE 0
+        END
+      FROM mutual_debts
+      WHERE (Debts.FromOperatorID = mutual_debts.op1 AND Debts.ToOperatorID = mutual_debts.op2)
+        OR (Debts.FromOperatorID = mutual_debts.op2 AND Debts.ToOperatorID = mutual_debts.op1);
       `);
-
-      // Process each pair
-      for (const debt of mutualDebts.rows) {
-        const netAmount = debt.op1_owes_op2 - debt.op2_owes_op1;
-
-        if (netAmount > 0) {
-          // op1 owes op2 the net amount
-          await pool.query(
-            `UPDATE Debts 
-             SET Amount = $1 
-             WHERE FromOperatorID = $2 AND ToOperatorID = $3`,
-            [netAmount, debt.op1, debt.op2]
-          );
-          await pool.query(
-            `UPDATE Debts 
-             SET Amount = $3
-             WHERE FromOperatorID = $1 AND ToOperatorID = $2`,
-            [debt.op2, debt.op1, 0]
-          );
-        } else if (netAmount < 0) {
-          // op2 owes op1 the net amount
-          await pool.query(
-            `UPDATE Debts 
-             SET Amount = $1 
-             WHERE FromOperatorID = $2 AND ToOperatorID = $3`,
-            [Math.abs(netAmount), debt.op2, debt.op1]
-          );
-          await pool.query(
-            `UPDATE Debts 
-             SET Amount = $3
-             WHERE FromOperatorID = $1 AND ToOperatorID = $2`,
-            [debt.op1, debt.op2, 0]
-          );
-        } else {
-          // Debts cancel out -
-          await pool.query(
-            `UPDATE Debts 
-             SET Amount = $3
-             WHERE (FromOperatorID = $1 AND ToOperatorID = $2)
-             OR (FromOperatorID = $2 AND ToOperatorID = $1)`,
-            [debt.op1, debt.op2, 0]
-          );
-        }
-      }
     } catch (error) {
       throw error;
     }
