@@ -47,7 +47,6 @@ function Debts() {
     setIsLoading(true);
     try {
       const result = await apiClient.payDebt(auth.token, payment);
-      console.log(result);
       setSuccess(result.message);
       setPayment({ toOperatorId: "", amount: "" });
       fetchDebts(); // Refresh debts after successful payment
