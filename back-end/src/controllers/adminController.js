@@ -2,6 +2,8 @@ const { TollStation, Pass, Operator } = require("../models");
 const { importStations, importPasses } = require("../utils/dbMigrate");
 const pool = require("../config/database");
 const path = require("path");
+const { formatResponse, getContentType } = require("../utils/formatResponse");
+const bcrypt = require("bcrypt");
 
 const adminController = {
   async healthcheck(req, res) {
@@ -12,13 +14,18 @@ const adminController = {
         pool.query("SELECT COUNT(DISTINCT tagRef) FROM Passes"),
       ]);
 
-      res.json({
+      const format = req.query.format || "json";
+
+      const response = {
         status: "OK",
         dbconnection: process.env.DB_NAME,
         n_stations: parseInt(n_stations.rows[0].count),
         n_tags: parseInt(n_tags.rows[0].count),
         n_passes: parseInt(n_passes.rows[0].count),
-      });
+      };
+
+      res.setHeader("Content-Type", getContentType(format));
+      res.send(formatResponse(response, format));
     } catch (error) {
       console.log(error);
       res.status(401).json({
@@ -34,7 +41,10 @@ const adminController = {
       await importStations(
         path.join(__dirname, "../../data/tollstations2024.csv")
       );
-      res.json({ status: "OK" });
+      const format = req.query.format || "json";
+      const response = { status: "OK" };
+      res.setHeader("Content-Type", getContentType(format));
+      res.send(formatResponse(response, format));
     } catch (error) {
       res.json({
         status: "failed",
@@ -46,7 +56,17 @@ const adminController = {
   async resetPasses(req, res) {
     try {
       await Pass.deleteAllPasses();
-      res.json({ status: "OK" });
+      await pool.query("UPDATE Debts SET amount = $1", [0]);
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash("freepasses4all", salt);
+      await pool.query(
+        `INSERT INTO USERS (username, password, role) VALUES ($1, $2, $3)`,
+        ["admin", hashedPassword, "admin"]
+      );
+      const format = req.query.format || "json";
+      const response = { status: "OK" };
+      res.setHeader("Content-Type", getContentType(format));
+      res.send(formatResponse(response, format));
     } catch (error) {
       res.json({
         status: "failed",
@@ -57,12 +77,20 @@ const adminController = {
 
   async addPasses(req, res) {
     try {
+      if (req.user.role !== "admin") {
+        return res
+          .status(401)
+          .json({ error: "Not Authorized, only for admin" });
+      }
       if (!req.file) {
         // the uplaoded file has to have key/name file in reqbody
         throw new Error("No file uploaded");
       }
       await importPasses(req.file.path);
-      res.json({ status: "OK" });
+      const format = req.query.format || "json";
+      const response = { status: "OK" };
+      res.setHeader("Content-Type", getContentType(format));
+      res.send(formatResponse(response, format));
     } catch (error) {
       res.json({
         status: "failed",

@@ -1,0 +1,2972 @@
+openapi: 3.0.0
+info:
+  title: InterPayTollApi
+  description: >-
+    The REST API is designed to manage toll station interoperability data. It
+    supports operations for storing and retrieving information, adhering to the
+    following base URL:
+
+
+    **Base URL:** `https://{{host}}:9115/api`
+
+
+    All API endpoints are structured as:  
+
+    `{baseURL}/{service}/{path-to-resource}`
+
+
+    Data formats supported: JSON (`application/json`) and CSV (`text/csv`). The
+    default format is JSON if not specified.
+  version: 1.0.0
+servers:
+  - url: https://localhost:9115
+components:
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: jwt
+    noauthAuth:
+      type: http
+      scheme: noauth
+tags:
+  - name: Management
+    description: Endpoints that offer help for automatic testing.
+  - name: Admin
+    description: >-
+      Actions that can only be performed by the admin for the correct handling
+      of the InterPayToll system
+  - name: Tolls
+    description: >-
+      Endpoints that offer various data about the toll stations and their
+      operators
+  - name: Debts
+    description: Endspoints for handling debts retrieval and payment between the operators
+paths:
+  /api/admin/healthcheck:
+    get:
+      tags:
+        - Management
+      summary: https://localhost:9115/api/admin/healthcheck
+      description: Check connectivity and see info about the current data
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '90'
+            ETag:
+              schema:
+                type: string
+                example: W/"5a-8UoX5tf/ob9bohelBskxhsVN5Vs"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 22:55:23 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: OK
+                dbconnection: interpaytoll
+                n_stations: 253
+                n_tags: 50
+                n_passes: 1002
+  /api/admin/resetstations:
+    post:
+      tags:
+        - Management
+      summary: https://localhost:9115/api/admin/resetstations
+      description: >-
+        Initiallizes toll stations data in the database based on the
+        tollstations.csv available in our server
+      requestBody:
+        content: {}
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '15'
+            ETag:
+              schema:
+                type: string
+                example: W/"f-v/Y1JusChTxrQUzPtNAKycooOTA"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 22:58:53 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: OK
+  /api/admin/resetpasses:
+    post:
+      tags:
+        - Management
+      summary: https://localhost:9115/api/admin/resetpasses
+      description: >-
+        Clears passes data in the database and initiallizes the admin user
+        credentials
+      requestBody:
+        content: {}
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '15'
+            ETag:
+              schema:
+                type: string
+                example: W/"f-v/Y1JusChTxrQUzPtNAKycooOTA"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 23:02:16 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: OK
+  /api/admin/addpasses:
+    post:
+      tags:
+        - Admin
+      summary: http://localhost:9115/api/admin/addpasses
+      description: Adds new passes data to the database
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '15'
+            ETag:
+              schema:
+                type: string
+                example: W/"f-v/Y1JusChTxrQUzPtNAKycooOTA"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 23:05:45 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: OK
+  /api/register:
+    post:
+      tags:
+        - Admin
+      summary: https://localhost:9115/api/register
+      description: Create accounts by providing username and password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: olympos
+                password: kolomuani
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '20'
+            ETag:
+              schema:
+                type: string
+                example: W/"14-Y53wuE/mmbSikKcT/WualL1N65U"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 23:08:53 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: success
+  /api/users:
+    get:
+      tags:
+        - Admin
+      summary: https://localhost:9115/api/users
+      description: >-
+        Get a list of all available users. (meant to be used in the cli (only
+        supports csv))
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3MzYxMTU5MDksImV4cCI6MTczNjIwMjMwOX0.H0pbARAA3VfcYX85fJkNrGAmulvGATRpTTNK93AGUSI
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: text/html; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '16'
+            ETag:
+              schema:
+                type: string
+                example: W/"10-uiO8IY18BrulILO3p4tYzo+4OaU"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 23:06:34 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |
+                Usernames
+                admin
+  /api/tollStationPasses/AM02/20220101/20220109:
+    get:
+      tags:
+        - Tolls
+      summary: >-
+        https://localhost:9115/api/tollStationPasses/:tollStationID/:date_from/:date_to
+      description: >-
+        Returns passes data specific to a toll station (tollstationID) in a
+        specific period of time.
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '827'
+            ETag:
+              schema:
+                type: string
+                example: W/"33b-Sb6mj/h0pL1aFROsr5SOIQ54h5w"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 23:10:03 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                stationID: AM02
+                stationOperator: AM
+                requestTimestamp: 2025-01-06 01:10
+                periodFrom: '2022-01-01'
+                periodTo: '2022-01-09'
+                nPasses: 5
+                passList:
+                  - passIndex: 1
+                    passID: 1233
+                    timestamp: 2022-01-04 09:59
+                    tagID: AMHJ7XVG0
+                    tagProvider: AM
+                    passType: home
+                    passCharge: 2
+                  - passIndex: 2
+                    passID: 1376
+                    timestamp: 2022-01-06 13:03
+                    tagID: NOQLL8OS9
+                    tagProvider: 'NO'
+                    passType: visitor
+                    passCharge: 2
+                  - passIndex: 3
+                    passID: 1385
+                    timestamp: 2022-01-06 16:46
+                    tagID: AMXAJI0Y6
+                    tagProvider: AM
+                    passType: home
+                    passCharge: 2
+                  - passIndex: 4
+                    passID: 1392
+                    timestamp: 2022-01-06 18:10
+                    tagID: AMHJ7XVG0
+                    tagProvider: AM
+                    passType: home
+                    passCharge: 2
+                  - passIndex: 5
+                    passID: 1469
+                    timestamp: 2022-01-07 21:00
+                    tagID: EGRHOCN9J
+                    tagProvider: EG
+                    passType: visitor
+                    passCharge: 2
+  /api/passAnalysis/AM09/NO/20220101/20220109:
+    get:
+      tags:
+        - Tolls
+      summary: >-
+        https://localhost:9115/api/passAnalysis/:stationOpID/:tagOpID/:date_from/:date_to
+      description: >-
+        Returns passes data that happen from cars that belong to the tagOpId to
+        stations that belong to stationOpID
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '267'
+            ETag:
+              schema:
+                type: string
+                example: W/"10b-tqwaZ5luE4K6gmMHIQakzrdfpZE"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 23:11:10 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                stationOpID: AM09
+                tagOpID: 'NO'
+                requestTimestamp: 2025-01-06 01:11
+                periodFrom: '2022-01-01'
+                periodTo: '2022-01-09'
+                nPasses: 1
+                passList:
+                  - passIndex: 1
+                    passID: 1006
+                    stationID: AM09
+                    timestamp: 2022-01-01 01:29
+                    tagID: NOQLL8OS9
+                    passCharge: 3.1
+  /api/passesCost/AM/NO/20220101/20220109:
+    get:
+      tags:
+        - Tolls
+      summary: >-
+        https://localhost:9115/api/passesCost/:tollOpID/:tagOpID/:date_from/:date_to
+      description: >-
+        Returns the amount of times car with a tagOpId passed from stations that
+        belong to tollOpID and the amount of money he owns to him in a specific
+        period of time.
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '150'
+            ETag:
+              schema:
+                type: string
+                example: W/"96-7I5mBCSJWild2dxFjNmov42pLdM"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 23:09:24 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                tollOpID: AM
+                tagOpID: 'NO'
+                requestTimestamp: 2025-01-06 01:09
+                periodFrom: '2022-01-01'
+                periodTo: '2022-01-09'
+                nPasses: 4
+                passesCost: 10.7
+  /api/chargesBy/AM/20220101/20220109:
+    get:
+      tags:
+        - Tolls
+      summary: https://localhost:9115/api/chargesBy/:tollOpID/:date_from/:date_to
+      description: >-
+        Returns amount of passes and money owned from every operator to the
+        tollOpID operator
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo
+        - name: format
+          in: query
+          schema:
+            type: string
+          example: csv
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: text/csv; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '458'
+            ETag:
+              schema:
+                type: string
+                example: W/"1ca-iqfp2sai92ZRfsooe/viV3Hi370"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 23:10:34 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: >
+                tollOpID,requestTimestamp,periodFrom,periodTo,vOpList
+
+                AM,2025-01-06
+                01:10,2022-01-01,2022-01-09,"[{""visitingOpID"":""EG"",""nPasses"":8,""passesCost"":21.5},{""visitingOpID"":""KO"",""nPasses"":3,""passesCost"":8.6},{""visitingOpID"":""MO"",""nPasses"":1,""passesCost"":2.2},{""visitingOpID"":""NAO"",""nPasses"":7,""passesCost"":18.8},{""visitingOpID"":""NO"",""nPasses"":4,""passesCost"":10.7},{""visitingOpID"":""OO"",""nPasses"":3,""passesCost"":8.4}]"
+  /api/traffic:
+    get:
+      tags:
+        - Tolls
+      summary: https://localhost:9115/api/traffic
+      description: >-
+        Returns the amount of passes through each operators tolls and the total
+        revenue generated by them grouped by year and month.
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InVzZXIiLCJ1c2VybmFtZSI6Im1vcmVhcyIsImlhdCI6MTczODUzMjEyMiwiZXhwIjoxNzM4NjE4NTIyfQ.ocQB4h8uKasM_5DYjDvsU7qY87KW75hwPeuH2EJwnpE
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '630'
+            ETag:
+              schema:
+                type: string
+                example: W/"276-2ZB9OoG8nx5FYhto8zke97+Bkp4"
+            Date:
+              schema:
+                type: string
+                example: Sun, 02 Feb 2025 21:36:39 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - year: '2022'
+                  data:
+                    - month: 1
+                      operator: aegeanmotorway
+                      opid: AM
+                      passes: 132
+                      revenue: 365.1
+                    - month: 1
+                      operator: egnatia
+                      opid: EG
+                      passes: 223
+                      revenue: 336
+                    - month: 1
+                      operator: gefyra
+                      opid: GE
+                      passes: 14
+                      revenue: 205.8
+                    - month: 1
+                      operator: kentrikiodos
+                      opid: KO
+                      passes: 106
+                      revenue: 260.65
+                    - month: 1
+                      operator: moreas
+                      opid: MO
+                      passes: 41
+                      revenue: 99.95
+                    - month: 1
+                      operator: naodos
+                      opid: NAO
+                      passes: 235
+                      revenue: 587.5
+                    - month: 1
+                      operator: neaodos
+                      opid: 'NO'
+                      passes: 132
+                      revenue: 484.85
+                    - month: 1
+                      operator: olympiaodos
+                      opid: OO
+                      passes: 119
+                      revenue: 300.7
+  /api/crossop/AM:
+    get:
+      tags:
+        - Tolls
+      summary: https://localhost:9115/api/crossop/opId
+      description: >-
+        Returns the number of passes and respective revenue through an operator
+        (opId) tolls by cars registered to other operators, grouped by operator
+        and year.
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InVzZXIiLCJ1c2VybmFtZSI6Im1vcmVhcyIsImlhdCI6MTczODUzMjEyMiwiZXhwIjoxNzM4NjE4NTIyfQ.ocQB4h8uKasM_5DYjDvsU7qY87KW75hwPeuH2EJwnpE
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '460'
+            ETag:
+              schema:
+                type: string
+                example: W/"1cc-7Frb2jcLtOG0ovBTUEwkL/wMDog"
+            Date:
+              schema:
+                type: string
+                example: Sun, 02 Feb 2025 21:44:22 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - year: '2022'
+                  data:
+                    - operator: egnatia
+                      opid: EG
+                      passes: 14
+                      revenue: 35.5
+                    - operator: gefyra
+                      opid: GE
+                      passes: 1
+                      revenue: 3.1
+                    - operator: kentrikiodos
+                      opid: KO
+                      passes: 5
+                      revenue: 15.3
+                    - operator: moreas
+                      opid: MO
+                      passes: 2
+                      revenue: 4.4
+                    - operator: naodos
+                      opid: NAO
+                      passes: 14
+                      revenue: 39.5
+                    - operator: neaodos
+                      opid: 'NO'
+                      passes: 7
+                      revenue: 18.6
+                    - operator: olympiaodos
+                      opid: OO
+                      passes: 6
+                      revenue: 16.3
+  /api/operators-with-stations:
+    get:
+      tags:
+        - Tolls
+      summary: https://localhost:9115/api/operators-with-stations
+      description: >-
+        Returns all stations of every operator, including their name,id and
+        geaographical location (Lat, Long). Seperated by the current logged in
+        operator and all other operators
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InVzZXIiLCJ1c2VybmFtZSI6Im1vcmVhcyIsImlhdCI6MTczOTAwNDQ4MywiZXhwIjoxNzM5MDkwODgzfQ.iycff9pdFOuvdxXmWfi7pR6zmUhTXs6XbtZUNQKX8M4
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '63714'
+            ETag:
+              schema:
+                type: string
+                example: W/"f8e2-HwPFseea3HdR3JFEPZhj6C0MRKk"
+            Date:
+              schema:
+                type: string
+                example: Sat, 08 Feb 2025 08:52:12 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                operatorsWithStations:
+                  - operatorid: AM
+                    operatorname: aegeanmotorway
+                    tollstations:
+                      - TollID: AM01
+                        Name: Σταθμός Διοδίων Κλειδίου Μετωπικά (Προς Αθήνα)
+                        Lat: 40.51974
+                        Long: 22.57247
+                      - TollID: AM02
+                        Name: Σταθμός Διοδίων Κλειδίου Μετωπικά (Προς Θεσσαλονίκη)
+                        Lat: 40.51943
+                        Long: 22.5729
+                      - TollID: AM03
+                        Name: Σταθμός Διοδίων Μακρυχωρίου Μετωπικά (Προς Αθήνα)
+                        Lat: 39.80461
+                        Long: 22.50252
+                      - TollID: AM04
+                        Name: >-
+                          Σταθμός Διοδίων Μακρυχωρίου Μετωπικά (Προς
+                          Θεσσαλονίκη)
+                        Lat: 39.80427
+                        Long: 22.5027
+                      - TollID: AM05
+                        Name: Σταθμός Διοδίων Μοσχοχωρίου Μετωπικά (Προς Αθήνα)
+                        Lat: 39.52294
+                        Long: 22.5567
+                      - TollID: AM06
+                        Name: >-
+                          Σταθμός Διοδίων Μοσχοχωρίου Μετωπικά (Προς
+                          Θεσσαλονίκη)
+                        Lat: 39.52292
+                        Long: 22.55705
+                      - TollID: AM07
+                        Name: Σταθμός Διοδίων Λεπτοκαρυάς Μετωπικά (Προς Αθήνα)
+                        Lat: 40.03581
+                        Long: 22.56973
+                      - TollID: AM08
+                        Name: >-
+                          Σταθμός Διοδίων Λεπτοκαρυάς Μετωπικά (Προς
+                          Θεσσαλονίκη)
+                        Lat: 40.03565
+                        Long: 22.56999
+                      - TollID: AM09
+                        Name: Σταθμός Διοδίων Πελασγίας Μετωπικά (Προς Αθήνα)
+                        Lat: 38.92051
+                        Long: 22.84637
+                      - TollID: AM10
+                        Name: Σταθμός Διοδίων Πελασγίας Μετωπικά (Προς Θεσσαλονίκη)
+                        Lat: 38.92015
+                        Long: 22.84633
+                      - TollID: AM11
+                        Name: Σταθμός Διοδίων Γυρτώνης Πλευρικά (Από Αθήνα)
+                        Lat: 39.74348
+                        Long: 22.47595
+                      - TollID: AM12
+                        Name: Σταθμός Διοδίων Γυρτώνης Πλευρικά (Προς Αθήνα)
+                        Lat: 39.74499
+                        Long: 22.47529
+                      - TollID: AM13
+                        Name: >-
+                          Σταθμός Διοδίων Ευαγγελισμού Πλευρικά (Από
+                          Θεσσαλονίκη)
+                        Lat: 39.82932
+                        Long: 22.51144
+                      - TollID: AM14
+                        Name: >-
+                          Σταθμός Διοδίων Ευαγγελισμού Πλευρικά (Προς
+                          Θεσσαλονίκη)
+                        Lat: 39.82932
+                        Long: 22.51359
+                      - TollID: AM15
+                        Name: Σταθμός Διοδίων Κιλελέρ Πλευρικά (Από Αθήνα)
+                        Lat: 39.4945
+                        Long: 22.62619
+                      - TollID: AM16
+                        Name: Σταθμός Διοδίων Κιλελέρ Πλευρικά (Προς Αθήνα)
+                        Lat: 39.49332
+                        Long: 22.61891
+                      - TollID: AM17
+                        Name: Σταθμός Διοδίων Μακρυχωρίου Πλευρικά (Από Αθήνα)
+                        Lat: 39.7968
+                        Long: 22.49904
+                      - TollID: AM18
+                        Name: >-
+                          Σταθμός Διοδίων Μεγάλου Μοναστηρίου Πλευρικά (Από
+                          Αθήνα)
+                        Lat: 39.44227
+                        Long: 22.68931
+                      - TollID: AM19
+                        Name: >-
+                          Σταθμός Διοδίων Μεγάλου Μοναστηρίου Πλευρικά (Προς
+                          Αθήνα)
+                        Lat: 39.44117
+                        Long: 22.68652
+                      - TollID: AM20
+                        Name: Σταθμός Διοδίων Πυργετού Πλευρικά (Προς Αθήνα)
+                        Lat: 39.90926
+                        Long: 22.62438
+                      - TollID: AM21
+                        Name: Σταθμός Διοδίων Πυργετού Πλευρικά (Προς Θεσσαλονίκη)
+                        Lat: 39.90894
+                        Long: 22.62438
+                      - TollID: AM22
+                        Name: Σταθμός Διοδίων Βελεστίνου Πλευρικά (Από Αθήνα)
+                        Lat: 39.38855
+                        Long: 22.76817
+                      - TollID: AM23
+                        Name: Σταθμός Διοδίων Βελεστίνου Πλευρικά (Προς Αθήνα)
+                        Lat: 39.389
+                        Long: 22.76446
+                      - TollID: AM24
+                        Name: Σταθμός Διοδίων Βελεστίνου Πλευρικά (Προς Αθήνα)
+                        Lat: 39.39075
+                        Long: 22.76492
+                      - TollID: AM25
+                        Name: Σταθμός Διοδίων Λεπτοκαρυάς Πλευρικά (Από Θεσσαλονίκη)
+                        Lat: 40.04498
+                        Long: 22.56406
+                      - TollID: AM26
+                        Name: >-
+                          Σταθμός Διοδίων Λεπτοκαρυάς Πλευρικά (Προς
+                          Θεσσαλονίκη)
+                        Lat: 40.04503
+                        Long: 22.56537
+                      - TollID: AM27
+                        Name: Σταθμός Διοδίων Πλαταμώνα Πλευρικά (Από Αθήνα)
+                        Lat: 39.98173
+                        Long: 22.62521
+                      - TollID: AM28
+                        Name: Σταθμός Διοδίων Πλαταμώνα Πλευρικά (Προς Αθήνα)
+                        Lat: 39.98173
+                        Long: 22.62488
+                      - TollID: AM29
+                        Name: Σταθμός Διοδίων Γλύφας Πλευρικά (Από Θεσσαλονίκη)
+                        Lat: 38.94941
+                        Long: 22.87566
+                      - TollID: AM30
+                        Name: Σταθμός Διοδίων Γλύφας Πλευρικά (Προς Θεσσαλονίκη)
+                        Lat: 38.94799
+                        Long: 22.87658
+                  - operatorid: EG
+                    operatorname: egnatia
+                    tollstations:
+                      - TollID: EG01
+                        Name: >-
+                          Σταθμός Διοδίων Σήραγγας Ακτίου Μετωπικά (Προς
+                          Αγρίνιο)
+                        Lat: 38.94008
+                        Long: 20.76598
+                      - TollID: EG02
+                        Name: >-
+                          Σταθμός Διοδίων Σήραγγας Ακτίου Μετωπικά (Προς
+                          Πρέβεζα)
+                        Lat: 38.94
+                        Long: 20.76634
+                      - TollID: EG03
+                        Name: Σταθμός Διοδίων Αρδανίου Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 40.94466
+                        Long: 26.20525
+                      - TollID: EG04
+                        Name: Σταθμός Διοδίων Αρδανίου Μετωπικά (Προς Κήπους)
+                        Lat: 40.94448
+                        Long: 26.20509
+                      - TollID: EG05
+                        Name: Σταθμός Διοδίων Μεστής Μετωπικά (Προς Αλεξ/πολη)
+                        Lat: 41.01349
+                        Long: 25.53327
+                      - TollID: EG06
+                        Name: Σταθμός Διοδίων Μεστής Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 41.01347
+                        Long: 25.53349
+                      - TollID: EG07
+                        Name: Σταθμός Διοδίων Ανάληψης Μετωπικά (Προς Αλεξ/πολη)
+                        Lat: 40.70685
+                        Long: 23.19131
+                      - TollID: EG08
+                        Name: Σταθμός Διοδίων Ανάληψης Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 40.70687
+                        Long: 23.19166
+                      - TollID: EG09
+                        Name: >-
+                          Σταθμός Διοδίων Ασπροβάλτας Μετωπικά (Προς
+                          Αλεξανδρούπολη)
+                        Lat: 40.72626
+                        Long: 23.69369
+                      - TollID: EG10
+                        Name: >-
+                          Σταθμός Διοδίων Ασπροβάλτας Μετωπικά (Προς
+                          Ηγουμενίτσα)
+                        Lat: 40.72651
+                        Long: 23.6937
+                      - TollID: EG11
+                        Name: >-
+                          Σταθμός Διοδίων Θεσσαλονίκης Μετωπικά (Προς
+                          Αλεξανδρούπολη)
+                        Lat: 40.69605
+                        Long: 22.89561
+                      - TollID: EG12
+                        Name: >-
+                          Σταθμός Διοδίων Θεσσαλονίκης Μετωπικά (Προς
+                          Ηγουμενίτσα)
+                        Lat: 40.69621
+                        Long: 22.89602
+                      - TollID: EG13
+                        Name: Σταθμός Διοδίων Μαλγάρων Μετωπικά (Προς Αθήνα)
+                        Lat: 40.60257
+                        Long: 22.69825
+                      - TollID: EG14
+                        Name: Σταθμός Διοδίων Μαλγάρων Μετωπικά (Προς Θεσσαλονίκη)
+                        Lat: 40.60222
+                        Long: 22.69828
+                      - TollID: EG15
+                        Name: Σταθμός Διοδίων Παμβώτιδας Μετωπικά (Προς Αλεξ/πολη)
+                        Lat: 39.61861
+                        Long: 20.94787
+                      - TollID: EG16
+                        Name: Σταθμός Διοδίων Παμβώτιδας Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 39.61887
+                        Long: 20.94798
+                      - TollID: EG17
+                        Name: Σταθμός Διοδίων Τύριας Μετωπικά (Προς Αλεξ/πολη)
+                        Lat: 39.54018
+                        Long: 20.67424
+                      - TollID: EG18
+                        Name: Σταθμός Διοδίων Τύριας Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 39.54018
+                        Long: 20.67446
+                      - TollID: EG19
+                        Name: Σταθμός Διοδίων Καβάλας Μετωπικά (Προς Αλεξ/πολη)
+                        Lat: 40.9597
+                        Long: 24.47231
+                      - TollID: EG20
+                        Name: Σταθμός Διοδίων Καβάλας Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 40.95996
+                        Long: 24.47252
+                      - TollID: EG21
+                        Name: Σταθμός Διοδίων Μουσθένης Μετωπικά (Προς Αλεξ/πολη)
+                        Lat: 40.8581
+                        Long: 24.16227
+                      - TollID: EG22
+                        Name: Σταθμός Διοδίων Μουσθένης Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 40.85828
+                        Long: 24.16236
+                      - TollID: EG23
+                        Name: >-
+                          Σταθμός Διοδίων Ιεροπηγής Μετωπικά (Προς
+                          Κρυσταλλοπηγή)
+                        Lat: 40.5745
+                        Long: 21.06155
+                      - TollID: EG24
+                        Name: Σταθμός Διοδίων Ιεροπηγής Μετωπικά (Προς Σιάτιστα)
+                        Lat: 40.57463
+                        Long: 21.06136
+                      - TollID: EG25
+                        Name: Σταθμός Διοδίων Ευζώνων Μετωπικά (Προς Μάλγαρα)
+                        Lat: 41.10873
+                        Long: 22.5584
+                      - TollID: EG26
+                        Name: Σταθμός Διοδίων Ευζώνων Μετωπικά (Προς Σύνορα)
+                        Lat: 41.10865
+                        Long: 22.55872
+                      - TollID: EG27
+                        Name: Σταθμός Διοδίων Πολύμυλου Μετωπικά (Προς Αλεξ/πολη)
+                        Lat: 40.36719
+                        Long: 22.06011
+                      - TollID: EG28
+                        Name: Σταθμός Διοδίων Πολύμυλου Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 40.36724
+                        Long: 22.06038
+                      - TollID: EG29
+                        Name: Σταθμός Διοδίων Σιάτιστας Μετωπικά (Προς Αλεξ/πολη)
+                        Lat: 40.2564
+                        Long: 21.63294
+                      - TollID: EG30
+                        Name: Σταθμός Διοδίων Σιάτιστας Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 40.25663
+                        Long: 21.63296
+                      - TollID: EG31
+                        Name: Σταθμός Διοδίων Ίασμου Μετωπικά (Προς Αλεξ/πολη)
+                        Lat: 41.12035
+                        Long: 25.08013
+                      - TollID: EG32
+                        Name: Σταθμός Διοδίων Ίασμου Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 41.12048
+                        Long: 25.08019
+                      - TollID: EG33
+                        Name: Σταθμός Διοδίων Προμαχώνα Μετωπικά (Προς Προμαχώνα)
+                        Lat: 41.3641
+                        Long: 23.35685
+                      - TollID: EG34
+                        Name: Σταθμός Διοδίων Προμαχώνα Μετωπικά (Προς Σέρρες)
+                        Lat: 41.36428
+                        Long: 23.35673
+                      - TollID: EG35
+                        Name: >-
+                          Σταθμός Διοδίων Στρυμονικού Μετωπικά (Προς
+                          Θεσσαλονίκη)
+                        Lat: 41.04377
+                        Long: 23.29506
+                      - TollID: EG36
+                        Name: Σταθμός Διοδίων Στρυμονικού Μετωπικά (Προς Σέρρες)
+                        Lat: 41.04362
+                        Long: 23.29504
+                      - TollID: EG37
+                        Name: Σταθμός Διοδίων Μαλακασίου Μετωπικά (Προς Αλεξ/πολη)
+                        Lat: 39.78944
+                        Long: 21.26681
+                      - TollID: EG38
+                        Name: Σταθμός Διοδίων Μαλακασίου Μετωπικά (Προς Ηγουμενίτσα)
+                        Lat: 39.78979
+                        Long: 21.26626
+                      - TollID: EG39
+                        Name: Σταθμός Διοδίων Μεστής Πλευρικά (Από Αλεξ/πολη)
+                        Lat: 40.96176
+                        Long: 25.64339
+                      - TollID: EG40
+                        Name: Σταθμός Διοδίων Μεστής Πλευρικά (Προς Αλεξ/πολη)
+                        Lat: 40.96122
+                        Long: 25.64278
+                      - TollID: EG41
+                        Name: Σταθμός Διοδίων Βαϊοχωρίου Πλευρικά (Από Αλεξ/πολη)
+                        Lat: 40.70133
+                        Long: 23.37106
+                      - TollID: EG42
+                        Name: Σταθμός Διοδίων Βαϊοχωρίου Πλευρικά (Προς Αλεξ/πολη)
+                        Lat: 40.70003
+                        Long: 23.37042
+                      - TollID: EG43
+                        Name: >-
+                          Σταθμός Διοδίων Λαγκαδά Πλευρικά (Είσοδος Προς
+                          Ηγουμενίτσα)
+                        Lat: 40.74036
+                        Long: 23.01134
+                      - TollID: EG44
+                        Name: >-
+                          Σταθμός Διοδίων Λαγκαδά Πλευρικά (Είσοδος Προς
+                          Ηγουμενίτσα)
+                        Lat: 40.74041
+                        Long: 23.00921
+                      - TollID: EG45
+                        Name: >-
+                          Σταθμός Διοδίων Λαγκαδά Πλευρικά (Έξοδος Από
+                          Ηγουμενίτσα)
+                        Lat: 40.73708
+                        Long: 23.00886
+                      - TollID: EG46
+                        Name: Σταθμός Διοδίων Ασπροβάλτας Πλευρικά (Από Ηγουμενίτσα)
+                        Lat: 40.70963
+                        Long: 23.68233
+                      - TollID: EG47
+                        Name: >-
+                          Σταθμός Διοδίων Ασπροβάλτας Πλευρικά (Προς
+                          Ηγουμενίτσα)
+                        Lat: 40.70969
+                        Long: 23.68007
+                      - TollID: EG48
+                        Name: Σταθμός Διοδίων Προφήτη Πλευρικά (Από Αλεξ/πολη)
+                        Lat: 40.68507
+                        Long: 23.25728
+                      - TollID: EG49
+                        Name: Σταθμός Διοδίων Προφήτη Πλευρικά (Προς Αλεξ/πολη)
+                        Lat: 40.68298
+                        Long: 23.26014
+                      - TollID: EG50
+                        Name: Σταθμός Διοδίων Αγίου Ανδρέα Πλευρικά (Από Αλεξ/πολη)
+                        Lat: 40.87301
+                        Long: 24.29632
+                      - TollID: EG51
+                        Name: Σταθμός Διοδίων Αγίου Ανδρέα Πλευρικά (Προς Αλεξ/πολη)
+                        Lat: 40.87425
+                        Long: 24.29886
+                      - TollID: EG52
+                        Name: >-
+                          Σταθμός Διοδίων Άσπρων Χωμάτων Πλευρικά (Από
+                          Ηγουμενίτσα)
+                        Lat: 40.95475
+                        Long: 24.4649
+                      - TollID: EG53
+                        Name: >-
+                          Σταθμός Διοδίων Άσπρων Χωμάτων Πλευρικά (Προς
+                          Ηγουμενίτσα)
+                        Lat: 40.95614
+                        Long: 24.46335
+                      - TollID: EG54
+                        Name: >-
+                          Σταθμός Διοδίων Ελευθερούπολης Πλευρικά (Από
+                          Αλεξ/πολη)
+                        Lat: 40.88656
+                        Long: 24.23466
+                      - TollID: EG55
+                        Name: >-
+                          Σταθμός Διοδίων Ελευθερούπολης Πλευρικά (Προς
+                          Αλεξ/πολη)
+                        Lat: 40.88405
+                        Long: 24.23595
+                      - TollID: EG56
+                        Name: Σταθμός Διοδίων Μουσθένης Πλευρικά (Από Ηγουμενίτσα)
+                        Lat: 40.83828
+                        Long: 24.11487
+                      - TollID: EG57
+                        Name: Σταθμός Διοδίων Μουσθένης Πλευρικά (Προς Ηγουμενίτσα)
+                        Lat: 40.84142
+                        Long: 24.1166
+                      - TollID: EG58
+                        Name: >-
+                          Σταθμός Διοδίων Γαληψού Ορφανίου Πλευρικά (Από
+                          Ηγουμενίτσα)
+                        Lat: 40.78273
+                        Long: 23.95742
+                      - TollID: EG59
+                        Name: >-
+                          Σταθμός Διοδίων Γαληψού Ορφανίου Πλευρικά (Προς
+                          Ηγουμενίτσα)
+                        Lat: 40.78738
+                        Long: 23.95591
+                      - TollID: EG60
+                        Name: Σταθμός Διοδίων Πολυκάστρου Πλευρικά (Από Πολύκαστρο)
+                        Lat: 40.98913
+                        Long: 22.60377
+                      - TollID: EG61
+                        Name: Σταθμός Διοδίων Πολυκάστρου Πλευρικά (Προς Πολύκαστρο)
+                        Lat: 40.98902
+                        Long: 22.60492
+                      - TollID: EG62
+                        Name: Σταθμός Διοδίων Καλαμιάς Πλευρικά (Από Αλεξ/πολη)
+                        Lat: 40.2978
+                        Long: 21.68065
+                      - TollID: EG63
+                        Name: Σταθμός Διοδίων Καλαμιάς Πλευρικά (Προς Αλεξ/πολη)
+                        Lat: 40.30186
+                        Long: 21.69036
+                      - TollID: EG64
+                        Name: >-
+                          Σταθμός Διοδίων Σιάτιστας Ανατολικά Πλευρικά (Από
+                          Ηγουμενίτσα)
+                        Lat: 40.23622
+                        Long: 21.57988
+                      - TollID: EG65
+                        Name: >-
+                          Σταθμός Διοδίων Σιάτιστας Ανατολικά Πλευρικά (Προς
+                          Ηγουμενίτσα)
+                        Lat: 40.23697
+                        Long: 21.57984
+                      - TollID: EG66
+                        Name: >-
+                          Σταθμός Διοδίων Βαφέικων Πλευρικά (Από Ηγουμενίτσα
+                          Προς Ξάνθη)
+                        Lat: 41.09622
+                        Long: 24.9466
+                      - TollID: EG67
+                        Name: >-
+                          Σταθμός Διοδίων Βαφέικων Πλευρικά (Από Ηγουμενίτσα
+                          Προς Πόρτο Λάγος)
+                        Lat: 41.09518
+                        Long: 24.94467
+                      - TollID: EG68
+                        Name: >-
+                          Σταθμός Διοδίων Βαφέικων Πλευρικά (Από Ξάνθη Προς
+                          Ηγουμενίτσα)
+                        Lat: 41.09463
+                        Long: 24.93714
+                      - TollID: EG69
+                        Name: >-
+                          Σταθμός Διοδίων Βαφέικων Πλευρικά (Από Πόρτο Λάγος
+                          Προς Ηγουμενίτσα)
+                        Lat: 41.0982
+                        Long: 24.94494
+                      - TollID: EG70
+                        Name: Σταθμός Διοδίων Ίασμου Πλευρικά (Από Αλεξ/πολη)
+                        Lat: 41.11714
+                        Long: 25.18443
+                      - TollID: EG71
+                        Name: Σταθμός Διοδίων Ίασμου Πλευρικά (Προς Αλεξ/πολη)
+                        Lat: 41.11562
+                        Long: 25.18446
+                      - TollID: EG72
+                        Name: >-
+                          Σταθμός Διοδίων ΒΙ.ΠΕ. Κομοτηνής Πλευρικά (Από
+                          Ηγουμενίτσα)
+                        Lat: 41.0596
+                        Long: 25.47539
+                      - TollID: EG73
+                        Name: >-
+                          Σταθμός Διοδίων ΒΙ.ΠΕ. Κομοτηνής Πλευρικά (Προς
+                          Ηγουμενίτσα)
+                        Lat: 41.06149
+                        Long: 25.47661
+                      - TollID: EG74
+                        Name: Σταθμός Διοδίων Παναγιάς Πλευρικά
+                        Lat: 39.78578
+                        Long: 21.29482
+                  - operatorid: GE
+                    operatorname: gefyra
+                    tollstations:
+                      - TollID: GE01
+                        Name: >-
+                          Σταθμός Διοδίων Γέφυρας Ρίου Αντιρρίου Μετωπικά (Προς
+                          Αντίρριο)
+                        Lat: 38.33383
+                        Long: 21.76604
+                      - TollID: GE02
+                        Name: >-
+                          Σταθμός Διοδίων Γέφυρας Ρίου Αντιρρίου Μετωπικά (Προς
+                          Ρίο)
+                        Lat: 38.33381
+                        Long: 21.76581
+                  - operatorid: KO
+                    operatorname: kentrikiodos
+                    tollstations:
+                      - TollID: KO01
+                        Name: Σταθμός Διοδίων Σοφάδων Μετωπικά (Προς Λαμία)
+                        Lat: 39.25717
+                        Long: 22.08299
+                      - TollID: KO02
+                        Name: Σταθμός Διοδίων Σοφάδων Μετωπικά (Προς Τρίκαλα)
+                        Lat: 39.25691
+                        Long: 22.0832
+                      - TollID: KO03
+                        Name: Σταθμός Διοδίων Τρικάλων Μετωπικά (Προς Λαμία)
+                        Lat: 39.5204
+                        Long: 21.83212
+                      - TollID: KO04
+                        Name: Σταθμός Διοδίων Τρικάλων Μετωπικά (Προς Τρίκαλα)
+                        Lat: 39.52022
+                        Long: 21.83249
+                      - TollID: KO05
+                        Name: Σταθμός Διοδίων Αγίας Τριάδας Μετωπικά (Προς Αθήνα)
+                        Lat: 38.80835
+                        Long: 22.60256
+                      - TollID: KO06
+                        Name: >-
+                          Σταθμός Διοδίων Αγίας Τριάδας Μετωπικά (Προς
+                          Θεσσαλονίκη)
+                        Lat: 38.80869
+                        Long: 22.6027
+                      - TollID: KO07
+                        Name: Σταθμός Διοδίων Λειανοκλαδίου Μετωπικά (Προς Λαμία)
+                        Lat: 38.91517
+                        Long: 22.34873
+                      - TollID: KO08
+                        Name: Σταθμός Διοδίων Λειανοκλαδίου Μετωπικά (Προς Τρίκαλα)
+                        Lat: 38.91495
+                        Long: 22.34906
+                      - TollID: KO09
+                        Name: Σταθμός Διοδίων Μαυρομαντήλας Μετωπικά (Προς Αθήνα)
+                        Lat: 38.90419
+                        Long: 22.52794
+                      - TollID: KO10
+                        Name: >-
+                          Σταθμός Διοδίων Μαυρομαντήλας Μετωπικά (Προς
+                          Θεσσαλονίκη)
+                        Lat: 38.90403
+                        Long: 22.52754
+                      - TollID: KO11
+                        Name: Σταθμός Διοδίων Ανάβρας Πλευρικά (Από Λαμία)
+                        Lat: 39.21048
+                        Long: 22.06925
+                      - TollID: KO12
+                        Name: Σταθμός Διοδίων Ανάβρας Πλευρικά (Προς Λαμία)
+                        Lat: 39.21025
+                        Long: 22.06905
+                      - TollID: KO13
+                        Name: Σταθμός Διοδίων Προαστίου Πλευρικά (Από Λαμία)
+                        Lat: 39.4748
+                        Long: 21.9031
+                      - TollID: KO14
+                        Name: Σταθμός Διοδίων Προαστίου Πλευρικά (Προς Λαμία)
+                        Lat: 39.4746
+                        Long: 21.90324
+                      - TollID: KO15
+                        Name: Σταθμός Διοδίων Καλαμπάκας Πλευρικά (Από Καλαμπάκα)
+                        Lat: 39.70028
+                        Long: 21.60858
+                      - TollID: KO16
+                        Name: Σταθμός Διοδίων Καλαμπάκας Πλευρικά (Προς Καλαμπάκα)
+                        Lat: 39.69975
+                        Long: 21.6108
+                      - TollID: KO17
+                        Name: Σταθμός Διοδίων Τρικάλων Πλευρικά (Από Τρίκαλα)
+                        Lat: 39.56901
+                        Long: 21.81829
+                      - TollID: KO18
+                        Name: Σταθμός Διοδίων Τρικάλων Πλευρικά (Προς Τρίκαλα)
+                        Lat: 39.56879
+                        Long: 21.81811
+                      - TollID: KO19
+                        Name: Σταθμός Διοδίων Αγίας Μαρίνας Πλευρικά (Από Θεσ/νίκη)
+                        Lat: 38.90377
+                        Long: 22.57063
+                      - TollID: KO20
+                        Name: Σταθμός Διοδίων Αγίας Μαρίνας Πλευρικά (Προς Θεσ/νίκη)
+                        Lat: 38.90305
+                        Long: 22.56907
+                      - TollID: KO21
+                        Name: Σταθμός Διοδίων Θερμοπυλών Πλευρικά (Από Θεσσαλονίκη)
+                        Lat: 38.79929
+                        Long: 22.50926
+                      - TollID: KO22
+                        Name: Σταθμός Διοδίων Θερμοπυλών Πλευρικά (Προς Θεσσαλονίκη)
+                        Lat: 38.79959
+                        Long: 22.51118
+                      - TollID: KO23
+                        Name: Σταθμός Διοδίων Μώλου Πλευρικά (Από Αθήνα)
+                        Lat: 38.80267
+                        Long: 22.64938
+                      - TollID: KO24
+                        Name: Σταθμός Διοδίων Μώλου Πλευρικά (Προς Αθήνα)
+                        Lat: 38.8029
+                        Long: 22.64952
+                      - TollID: KO25
+                        Name: Σταθμός Διοδίων Στυλίδας Πλευρικά (Από Θεσσαλονίκη)
+                        Lat: 38.91363
+                        Long: 22.659
+                      - TollID: KO26
+                        Name: Σταθμός Διοδίων Στυλίδας Πλευρικά (Προς Θεσσαλονίκη)
+                        Lat: 38.91357
+                        Long: 22.65774
+                  - operatorid: MO
+                    operatorname: moreas
+                    tollstations:
+                      - TollID: MO01
+                        Name: Σταθμός Διοδίων Βελιγοστής Μετωπικά (Προς Καλαμάτα)
+                        Lat: 37.34516
+                        Long: 22.11037
+                      - TollID: MO02
+                        Name: Σταθμός Διοδίων Βελιγοστής Μετωπικά (Προς Κόρινθο)
+                        Lat: 37.34483
+                        Long: 22.1103
+                      - TollID: MO03
+                        Name: >-
+                          Σταθμός Διοδίων Γέφυρας Μάναρη Μετωπικά (Προς
+                          Καλαμάτα)
+                        Lat: 37.41249
+                        Long: 22.30764
+                      - TollID: MO04
+                        Name: Σταθμός Διοδίων Γέφυρας Μάναρη Μετωπικά (Προς Κόρινθο)
+                        Lat: 37.4122
+                        Long: 22.30776
+                      - TollID: MO05
+                        Name: Σταθμός Διοδίων Νεστάνης Μετωπικά (Προς Καλαμάτα)
+                        Lat: 37.60085
+                        Long: 22.44646
+                      - TollID: MO06
+                        Name: Σταθμός Διοδίων Νεστάνης Μετωπικά (Προς Κόρινθο)
+                        Lat: 37.60057
+                        Long: 22.44655
+                      - TollID: MO07
+                        Name: >-
+                          Σταθμός Διοδίων Πετρίνας Μετωπικά (Προς
+                          Κόρινθο-Καλαμάτα)
+                        Lat: 37.29864
+                        Long: 22.21032
+                      - TollID: MO08
+                        Name: Σταθμός Διοδίων Πετρίνας Μετωπικά (Προς Σπάρτη)
+                        Lat: 37.29884
+                        Long: 22.21009
+                      - TollID: MO09
+                        Name: Σταθμός Διοδίων Σπαθοβουνίου Μετωπικά (Προς Καλαμάτα)
+                        Lat: 37.83599
+                        Long: 22.80797
+                      - TollID: MO10
+                        Name: Σταθμός Διοδίων Σπαθοβουνίου Μετωπικά (Προς Κόρινθο)
+                        Lat: 37.83565
+                        Long: 22.80808
+                      - TollID: MO11
+                        Name: Σταθμός Διοδίων Καλαμάτας Μετωπικά (Προς Καλαμάτα)
+                        Lat: 37.13694
+                        Long: 22.03779
+                      - TollID: MO12
+                        Name: Σταθμός Διοδίων Καλαμάτας Μετωπικά (Προς Κόρινθο)
+                        Lat: 37.13675
+                        Long: 22.0381
+                      - TollID: MO13
+                        Name: Σταθμός Διοδίων Αρφαρών Πλευρικά (Από Κόρινθο)
+                        Lat: 37.15246
+                        Long: 22.0261
+                      - TollID: MO14
+                        Name: Σταθμός Διοδίων Αρφαρών Πλευρικά (Προς Κόρινθο)
+                        Lat: 37.15349
+                        Long: 22.02565
+                      - TollID: MO15
+                        Name: Σταθμός Διοδίων Θουρίας Πλευρικά (Από Καλαμάτα)
+                        Lat: 37.07192
+                        Long: 22.04808
+                      - TollID: MO16
+                        Name: Σταθμός Διοδίων Θουρίας Πλευρικά (Προς Καλαμάτα)
+                        Lat: 37.07162
+                        Long: 22.04731
+                      - TollID: MO17
+                        Name: Σταθμός Διοδίων Παραδείσιων Πλευρικά (Από Καλαμάτα)
+                        Lat: 37.33067
+                        Long: 22.07845
+                      - TollID: MO18
+                        Name: Σταθμός Διοδίων Παραδείσιων Πλευρικά (Προς Καλαμάτα)
+                        Lat: 37.33179
+                        Long: 22.07778
+                  - operatorid: NAO
+                    operatorname: naodos
+                    tollstations:
+                      - TollID: NAO01
+                        Name: Σταθμός Διοδίων Αγίας Παρασκευής Πλευρικά (Προς Καρέα)
+                        Lat: 38.00812
+                        Long: 23.83668
+                      - TollID: NAO02
+                        Name: >-
+                          Σταθμός Διοδίων Αγίας Παρασκευής Πλευρικά (Προς
+                          Παλλήνη)
+                        Lat: 38.0091
+                        Long: 23.84211
+                      - TollID: NAO03
+                        Name: Σταθμός Διοδίων Δημόκριτου Πλευρικά (Προς Παλλήνη)
+                        Lat: 37.99958
+                        Long: 23.8212
+                      - TollID: NAO04
+                        Name: Σταθμός Διοδίων Ανθούσας Πλευρικά (Προς Ελευσίνα)
+                        Lat: 38.01688
+                        Long: 23.86606
+                      - TollID: NAO05
+                        Name: >-
+                          Σταθμός Διοδίων Περιφεριακής Αιγάλεω Πλευρικά (Προς
+                          Αεροδρόμιο)
+                        Lat: 38.07565
+                        Long: 23.67635
+                      - TollID: NAO06
+                        Name: >-
+                          Σταθμός Διοδίων Περιφεριακής Αιγάλεω Πλευρικά (Προς
+                          Ελευσίνα)
+                        Lat: 38.08009
+                        Long: 23.67856
+                      - TollID: NAO07
+                        Name: Σταθμός Διοδίων Ασπροπύργου Πλευρικά (Προς Αεροδρόμιο)
+                        Lat: 38.08919
+                        Long: 23.6222
+                      - TollID: NAO08
+                        Name: Σταθμός Διοδίων Ασπροπύργου Πλευρικά (Προς Ελευσίνα)
+                        Lat: 38.0904
+                        Long: 23.61994
+                      - TollID: NAO09
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Δουκίσσης Πλακεντίας Πλευρικά
+                          (Προς Αεροδρόμιο)
+                        Lat: 38.02401
+                        Long: 23.83473
+                      - TollID: NAO10
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Δουκίσσης Πλακεντίας Πλευρικά
+                          (Προς Ελευσίνα)
+                        Lat: 38.02517
+                        Long: 23.83393
+                      - TollID: NAO11
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Δουκίσσης Πλακεντίας Πλευρικά
+                          (Προς Καρέα)
+                        Lat: 38.01935
+                        Long: 23.83767
+                      - TollID: NAO12
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Πεντέλης Πλευρικά (Προς
+                          Αεροδρόμιο)
+                        Lat: 38.02703
+                        Long: 23.82915
+                      - TollID: NAO13
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Πεντέλης Πλευρικά (Προς
+                          Ελευσίνα)
+                        Lat: 38.03427
+                        Long: 23.82164
+                      - TollID: NAO14
+                        Name: Σταθμός Διοδίων Γλυκών Νερών Πλευρικά (Προς Καρέα)
+                        Lat: 37.99753
+                        Long: 23.84944
+                      - TollID: NAO15
+                        Name: Σταθμός Διοδίων Γλυκών Νερών Πλευρικά (Προς Παλλήνη)
+                        Lat: 37.9971
+                        Long: 23.85116
+                      - TollID: NAO16
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Δημοκρατίας Πλευρικά (Προς
+                          Αεροδρόμιο)
+                        Lat: 38.06607
+                        Long: 23.73427
+                      - TollID: NAO17
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Δημοκρατίας Πλευρικά (Προς
+                          Ελευσίνα)
+                        Lat: 38.06741
+                        Long: 23.73161
+                      - TollID: NAO18
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Ηρακλείου Πλευρικά (Προς
+                          Αεροδρόμιο)
+                        Lat: 38.05641
+                        Long: 23.77234
+                      - TollID: NAO19
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Ηρακλείου Πλευρικά (Προς
+                          Ελευσίνα)
+                        Lat: 38.05859
+                        Long: 23.76884
+                      - TollID: NAO20
+                        Name: Σταθμός Διοδίων Λεωφ. Κύμης Πλευρικά (Προς Αεροδρόμιο)
+                        Lat: 38.04838
+                        Long: 23.78561
+                      - TollID: NAO21
+                        Name: Σταθμός Διοδίων Λεωφ. Κύμης Πλευρικά (Προς Ελευσίνα)
+                        Lat: 38.05237
+                        Long: 23.78147
+                      - TollID: NAO22
+                        Name: Σταθμός Διοδίων Λεωφ. Φυλής Πλευρικά (Προς Αεροδρόμιο)
+                        Lat: 38.07018
+                        Long: 23.71147
+                      - TollID: NAO23
+                        Name: Σταθμός Διοδίων Λεωφ. Φυλής Πλευρικά (Προς Ελευσίνα)
+                        Lat: 38.07138
+                        Long: 23.70832
+                      - TollID: NAO24
+                        Name: Σταθμός Διοδίων Κορωπίου Μετωπικά (Προς Ελευσίνα)
+                        Lat: 37.93851
+                        Long: 23.88683
+                      - TollID: NAO25
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Κηφισίας Πλευρικά (Προς
+                          Αεροδρόμιο)
+                        Lat: 38.04123
+                        Long: 23.8053
+                      - TollID: NAO26
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Κηφισίας Πλευρικά (Προς
+                          Ελευσίνα)
+                        Lat: 38.04366
+                        Long: 23.79931
+                      - TollID: NAO27
+                        Name: >-
+                          Σταθμός Διοδίων Αθηνών-Λαμίας Πλευρικά (Από Αθήνα Προς
+                          Αεροδρόμιο)
+                        Lat: 38.06086
+                        Long: 23.7505
+                      - TollID: NAO28
+                        Name: >-
+                          Σταθμός Διοδίων Αθηνών-Λαμίας Πλευρικά (Από Αθήνα Προς
+                          Ελευσίνα)
+                        Lat: 38.06285
+                        Long: 23.74866
+                      - TollID: NAO29
+                        Name: >-
+                          Σταθμός Διοδίων Αθηνών-Λαμίας Πλευρικά (Από Λαμία Προς
+                          Αεροδρόμιο)
+                        Lat: 38.0612
+                        Long: 23.75044
+                      - TollID: NAO30
+                        Name: >-
+                          Σταθμός Διοδίων Αθηνών-Λαμίας Πλευρικά (Από Λαμία Προς
+                          Ελευσίνα)
+                        Lat: 38.06315
+                        Long: 23.74873
+                      - TollID: NAO31
+                        Name: Σταθμός Διοδίων Παιανίας Πλευρικά (Προς Αεροδρόμιο)
+                        Lat: 37.95341
+                        Long: 23.88573
+                      - TollID: NAO32
+                        Name: Σταθμός Διοδίων Παιανίας Πλευρικά (Προς Ελευσίνα)
+                        Lat: 37.95731
+                        Long: 23.88672
+                      - TollID: NAO33
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Μαραθώνος Πλευρικά (Προς
+                          Αεροδρόμιο)
+                        Lat: 38.00431
+                        Long: 23.86971
+                      - TollID: NAO34
+                        Name: >-
+                          Σταθμός Διοδίων Λεωφ. Μαραθώνος Πλευρικά (Προς
+                          Ελευσίνα)
+                        Lat: 38.00805
+                        Long: 23.86918
+                      - TollID: NAO35
+                        Name: Σταθμός Διοδίων Παλλήνης Πλευρικά (Προς Καρέα)
+                        Lat: 37.99397
+                        Long: 23.88736
+                      - TollID: NAO36
+                        Name: Σταθμός Διοδίων Κατεχάκη Μετωπικά (Προς Παλλήνη)
+                        Lat: 37.9772
+                        Long: 23.8001
+                      - TollID: NAO37
+                        Name: Σταθμός Διοδίων Παπάγου Πλευρικά (Προς Καρέα)
+                        Lat: 37.98565
+                        Long: 23.80999
+                      - TollID: NAO38
+                        Name: Σταθμός Διοδίων Παπάγου Πλευρικά (Προς Παλλήνη)
+                        Lat: 37.98559
+                        Long: 23.8125
+                      - TollID: NAO39
+                        Name: Σταθμός Διοδίων Ρουπακίου Μετωπικά (Προς Αεροδρόμιο)
+                        Lat: 38.09389
+                        Long: 23.59099
+                      - TollID: NAO40
+                        Name: Σταθμός Διοδίων Κάντζας Πλευρικά (Προς Αεροδρόμιο)
+                        Lat: 37.98003
+                        Long: 23.8699
+                      - TollID: NAO41
+                        Name: Σταθμός Διοδίων Κάντζας Πλευρικά (Προς Ελευσίνα)
+                        Lat: 37.98229
+                        Long: 23.87047
+                  - operatorid: 'NO'
+                    operatorname: neaodos
+                    tollstations:
+                      - TollID: NO01
+                        Name: Σταθμός Διοδίων Αγγελόκαστρου Μετωπικά (Προς Ιωάννινα)
+                        Lat: 38.54935
+                        Long: 21.27241
+                      - TollID: NO02
+                        Name: Σταθμός Διοδίων Αγγελόκαστρου Μετωπικά (Προς Ρίο)
+                        Lat: 38.54947
+                        Long: 21.2721
+                      - TollID: NO03
+                        Name: Σταθμός Διοδίων Κλόκοβας Μετωπικά (Προς Ιωάννινα)
+                        Lat: 38.35929
+                        Long: 21.65685
+                      - TollID: NO04
+                        Name: Σταθμός Διοδίων Κλόκοβας Μετωπικά (Προς Ρίο)
+                        Lat: 38.35921
+                        Long: 21.6564
+                      - TollID: NO05
+                        Name: Σταθμός Διοδίων Μενιδίου Μετωπικά (Προς Ιωάννινα)
+                        Lat: 38.98982
+                        Long: 21.17102
+                      - TollID: NO06
+                        Name: Σταθμός Διοδίων Μενιδίου Μετωπικά (Προς Ρίο)
+                        Lat: 38.98999
+                        Long: 21.17073
+                      - TollID: NO07
+                        Name: Σταθμός Διοδίων Αφιδνών Μετωπικά (Προς Αθήνα)
+                        Lat: 38.1765
+                        Long: 23.85388
+                      - TollID: NO08
+                        Name: Σταθμός Διοδίων Αφιδνών Μετωπικά (Προς Θεσσαλονίκη)
+                        Lat: 38.17634
+                        Long: 23.85444
+                      - TollID: NO09
+                        Name: Σταθμός Διοδίων Θήβας Μετωπικά (Προς Αθήνα)
+                        Lat: 38.37082
+                        Long: 23.28677
+                      - TollID: NO10
+                        Name: Σταθμός Διοδίων Θήβας Μετωπικά (Προς Θεσσαλονίκη)
+                        Lat: 38.3709
+                        Long: 23.28704
+                      - TollID: NO11
+                        Name: Σταθμός Διοδίων Τερόβου Μετωπικά (Προς Ιωάννινα)
+                        Lat: 39.42539
+                        Long: 20.90533
+                      - TollID: NO12
+                        Name: Σταθμός Διοδίων Τερόβου Μετωπικά (Προς Ρίο)
+                        Lat: 39.42559
+                        Long: 20.90509
+                      - TollID: NO13
+                        Name: Σταθμός Διοδίων Τραγάνας Μετωπικά (Προς Αθήνα)
+                        Lat: 38.6175
+                        Long: 23.14335
+                      - TollID: NO14
+                        Name: Σταθμός Διοδίων Τραγάνας Μετωπικά (Προς Θεσσαλονίκη)
+                        Lat: 38.61772
+                        Long: 23.14384
+                      - TollID: NO15
+                        Name: Σταθμός Διοδίων Γαβρολίμνης Πλευρικά (Από Ιωάννινα)
+                        Lat: 38.37341
+                        Long: 21.62484
+                      - TollID: NO16
+                        Name: Σταθμός Διοδίων Γαβρολίμνης Πλευρικά (Προς Ιωάννινα)
+                        Lat: 38.37419
+                        Long: 21.6251
+                      - TollID: NO17
+                        Name: Σταθμός Διοδίων Μεσολογγίου Πλευρικά (Από Ιωάννινα)
+                        Lat: 38.37953
+                        Long: 21.4953
+                      - TollID: NO18
+                        Name: Σταθμός Διοδίων Μεσολογγίου Πλευρικά (Προς Ιωάννινα)
+                        Lat: 38.37935
+                        Long: 21.49496
+                      - TollID: NO19
+                        Name: Σταθμός Διοδίων Κουβαρά Πλευρικά (Από Ιωάννινα)
+                        Lat: 38.69941
+                        Long: 21.21408
+                      - TollID: NO20
+                        Name: Σταθμός Διοδίων Κουβαρά Πλευρικά (Προς Ιωάννινα)
+                        Lat: 38.70032
+                        Long: 21.21573
+                      - TollID: NO21
+                        Name: Σταθμός Διοδίων Άρτας Πλευρικά (Από Ιωάννινα)
+                        Lat: 39.16037
+                        Long: 21.01087
+                      - TollID: NO22
+                        Name: Σταθμός Διοδίων Άρτας Πλευρικά (Προς Ιωάννινα)
+                        Lat: 39.16064
+                        Long: 21.01217
+                      - TollID: NO23
+                        Name: >-
+                          Σταθμός Διοδίων Καπανδριτίου Πλευρικά (Από
+                          Θεσσαλονίκη)
+                        Lat: 38.20262
+                        Long: 23.85396
+                      - TollID: NO24
+                        Name: >-
+                          Σταθμός Διοδίων Καπανδριτίου Πλευρικά (Προς
+                          Θεσσαλονίκη)
+                        Lat: 38.20275
+                        Long: 23.85477
+                      - TollID: NO25
+                        Name: Σταθμός Διοδίων Μαλακάσας Πλευρικά (Από Θεσσαλονίκη)
+                        Lat: 38.23753
+                        Long: 23.78053
+                      - TollID: NO26
+                        Name: Σταθμός Διοδίων Μαλακάσας Πλευρικά (Προς Θεσσαλονίκη)
+                        Lat: 38.23633
+                        Long: 23.786
+                      - TollID: NO27
+                        Name: Σταθμός Διοδίων Θήβας Πλευρικά (Από Θεσσαλονίκη)
+                        Lat: 38.36621
+                        Long: 23.32467
+                      - TollID: NO28
+                        Name: Σταθμός Διοδίων Θήβας Πλευρικά (Προς Θεσσαλονίκη)
+                        Lat: 38.36403
+                        Long: 23.32208
+                      - TollID: NO29
+                        Name: Σταθμός Διοδίων Οινοφύτων Πλευρικά (Από Θεσσαλονίκη)
+                        Lat: 38.28925
+                        Long: 23.67591
+                      - TollID: NO30
+                        Name: Σταθμός Διοδίων Οινοφύτων Πλευρικά (Προς Θεσσαλονίκη)
+                        Lat: 38.29219
+                        Long: 23.67477
+                      - TollID: NO31
+                        Name: Σταθμός Διοδίων Γοργόμυλου Πλευρικά (Από Ρίο)
+                        Lat: 39.3317
+                        Long: 20.91559
+                      - TollID: NO32
+                        Name: Σταθμός Διοδίων Γοργόμυλου Πλευρικά (Προς Ρίο)
+                        Lat: 39.33199
+                        Long: 20.91415
+                      - TollID: NO33
+                        Name: Σταθμός Διοδίων Τραγάνας Πλευρικά (Από Θεσσαλονίκη)
+                        Lat: 38.62199
+                        Long: 23.12357
+                      - TollID: NO34
+                        Name: Σταθμός Διοδίων Τραγάνας Πλευρικά (Προς Θεσσαλονίκη)
+                        Lat: 38.62253
+                        Long: 23.12381
+                  - operatorid: OO
+                    operatorname: olympiaodos
+                    tollstations:
+                      - TollID: OO01
+                        Name: Σταθμός Διοδίων Ελευσίνας Μετωπικά (Προς Αθήνα)
+                        Lat: 38.04199
+                        Long: 23.49613
+                      - TollID: OO02
+                        Name: Σταθμός Διοδίων Ελευσίνας Μετωπικά (Προς Πάτρα)
+                        Lat: 38.0425
+                        Long: 23.49545
+                      - TollID: OO03
+                        Name: Σταθμός Διοδίων Ρίου Μετωπικά (Προς Αθήνα)
+                        Lat: 38.31624
+                        Long: 21.83038
+                      - TollID: OO04
+                        Name: Σταθμός Διοδίων Ρίου Μετωπικά (Προς Πάτρα)
+                        Lat: 38.31663
+                        Long: 21.82995
+                      - TollID: OO05
+                        Name: Σταθμός Διοδίων Ελαιώνα Μετωπικά (Προς Αθήνα)
+                        Lat: 38.19048
+                        Long: 22.16526
+                      - TollID: OO06
+                        Name: Σταθμός Διοδίων Ελαιώνα Μετωπικά (Προς Πάτρα)
+                        Lat: 38.19092
+                        Long: 22.1656
+                      - TollID: OO07
+                        Name: Σταθμός Διοδίων Ισθμίων Μετωπικά (Προς Αθήνα)
+                        Lat: 37.92481
+                        Long: 23.03208
+                      - TollID: OO08
+                        Name: Σταθμός Διοδίων Ισθμίων Μετωπικά (Προς Πάτρα)
+                        Lat: 37.92535
+                        Long: 23.03274
+                      - TollID: OO09
+                        Name: Σταθμός Διοδίων Κιάτου Μετωπικά (Προς Αθήνα)
+                        Lat: 37.99692
+                        Long: 22.73517
+                      - TollID: OO10
+                        Name: Σταθμός Διοδίων Κιάτου Μετωπικά (Προς Πάτρα)
+                        Lat: 37.99651
+                        Long: 22.73565
+                      - TollID: OO11
+                        Name: Σταθμός Διοδίων Νέας Περάμου Πλευρικά (Από Πάτρα)
+                        Lat: 38.01988
+                        Long: 23.42843
+                      - TollID: OO12
+                        Name: Σταθμός Διοδίων Νέας Περάμου Πλευρικά (Προς Πάτρα)
+                        Lat: 38.0197
+                        Long: 23.42683
+                      - TollID: OO13
+                        Name: Σταθμός Διοδίων Πάχης Πλευρικά (Από Πάτρα)
+                        Lat: 37.98501
+                        Long: 23.34987
+                      - TollID: OO14
+                        Name: Σταθμός Διοδίων Πάχης Πλευρικά (Προς Πάτρα)
+                        Lat: 37.9859
+                        Long: 23.3491
+                      - TollID: OO15
+                        Name: Σταθμός Διοδίων Δρεπάνου Πλευρικά (Από Αθήνα)
+                        Lat: 38.32496
+                        Long: 21.858
+                      - TollID: OO16
+                        Name: Σταθμός Διοδίων Δρεπάνου Πλευρικά (Προς Αθήνα)
+                        Lat: 38.32513
+                        Long: 21.85815
+                      - TollID: OO17
+                        Name: Σταθμός Διοδίων Ακράτας Πλευρικά (Από Αθήνα)
+                        Lat: 38.15655
+                        Long: 22.34285
+                      - TollID: OO18
+                        Name: Σταθμός Διοδίων Ακράτας Πλευρικά (Προς Αθήνα)
+                        Lat: 38.15715
+                        Long: 22.34236
+                      - TollID: OO19
+                        Name: Σταθμός Διοδίων Καλαβρύτων Πλευρικά (Από Αθήνα)
+                        Lat: 38.17475
+                        Long: 22.23938
+                      - TollID: OO20
+                        Name: Σταθμός Διοδίων Καλαβρύτων Πλευρικά (Προς Αθήνα)
+                        Lat: 38.17461
+                        Long: 22.23961
+                      - TollID: OO21
+                        Name: Σταθμός Διοδίων Αγίων Θεοδώρων Πλευρικά (Από Αθήνα)
+                        Lat: 37.92207
+                        Long: 23.11896
+                      - TollID: OO22
+                        Name: Σταθμός Διοδίων Αγίων Θεοδώρων Πλευρικά (Προς Αθήνα)
+                        Lat: 37.92194
+                        Long: 23.11967
+                      - TollID: OO23
+                        Name: Σταθμός Διοδίων Δερβενίου Πλευρικά (Από Αθήνα)
+                        Lat: 38.13183
+                        Long: 22.40492
+                      - TollID: OO24
+                        Name: Σταθμός Διοδίων Δερβενίου Πλευρικά (Προς Αθήνα)
+                        Lat: 38.13193
+                        Long: 22.40525
+                      - TollID: OO25
+                        Name: Σταθμός Διοδίων Ζευγολατιού Πλευρικά (Από Αθήνα)
+                        Lat: 37.93143
+                        Long: 22.78815
+                      - TollID: OO26
+                        Name: Σταθμός Διοδίων Ζευγολατιού Πλευρικά (Προς Αθήνα)
+                        Lat: 37.93128
+                        Long: 22.78786
+                      - TollID: OO27
+                        Name: Σταθμός Διοδίων Κιάτου Πλευρικά (Από Πάτρα)
+                        Lat: 38.00783
+                        Long: 22.73326
+                      - TollID: OO28
+                        Name: Σταθμός Διοδίων Κιάτου Πλευρικά (Προς Πάτρα)
+                        Lat: 38.00783
+                        Long: 22.73354
+                userOperatorId: MO
+                incomingPasses:
+                  - tollid: MO12
+                    tollstationname: Σταθμός Διοδίων Καλαμάτας Μετωπικά (Προς Κόρινθο)
+                    totalpasses: '210'
+                    totalrevenue: '430.50'
+                  - tollid: MO09
+                    tollstationname: Σταθμός Διοδίων Σπαθοβουνίου Μετωπικά (Προς Καλαμάτα)
+                    totalpasses: '207'
+                    totalrevenue: '558.90'
+                  - tollid: MO06
+                    tollstationname: Σταθμός Διοδίων Νεστάνης Μετωπικά (Προς Κόρινθο)
+                    totalpasses: '206'
+                    totalrevenue: '535.60'
+                  - tollid: MO05
+                    tollstationname: Σταθμός Διοδίων Νεστάνης Μετωπικά (Προς Καλαμάτα)
+                    totalpasses: '202'
+                    totalrevenue: '525.20'
+                  - tollid: MO02
+                    tollstationname: Σταθμός Διοδίων Βελιγοστής Μετωπικά (Προς Κόρινθο)
+                    totalpasses: '194'
+                    totalrevenue: '261.90'
+                  - tollid: MO07
+                    tollstationname: Σταθμός Διοδίων Πετρίνας Μετωπικά (Προς Κόρινθο-Καλαμάτα)
+                    totalpasses: '187'
+                    totalrevenue: '589.05'
+                  - tollid: MO08
+                    tollstationname: Σταθμός Διοδίων Πετρίνας Μετωπικά (Προς Σπάρτη)
+                    totalpasses: '184'
+                    totalrevenue: '579.60'
+                  - tollid: MO03
+                    tollstationname: Σταθμός Διοδίων Γέφυρας Μάναρη Μετωπικά (Προς Καλαμάτα)
+                    totalpasses: '180'
+                    totalrevenue: '378.00'
+                  - tollid: MO01
+                    tollstationname: Σταθμός Διοδίων Βελιγοστής Μετωπικά (Προς Καλαμάτα)
+                    totalpasses: '179'
+                    totalrevenue: '241.65'
+                  - tollid: MO04
+                    tollstationname: Σταθμός Διοδίων Γέφυρας Μάναρη Μετωπικά (Προς Κόρινθο)
+                    totalpasses: '178'
+                    totalrevenue: '373.80'
+                  - tollid: MO11
+                    tollstationname: Σταθμός Διοδίων Καλαμάτας Μετωπικά (Προς Καλαμάτα)
+                    totalpasses: '161'
+                    totalrevenue: '330.05'
+                  - tollid: MO10
+                    tollstationname: Σταθμός Διοδίων Σπαθοβουνίου Μετωπικά (Προς Κόρινθο)
+                    totalpasses: '146'
+                    totalrevenue: '394.20'
+                outgoingPasses:
+                  - tollid: NO13
+                    tollstationname: Σταθμός Διοδίων Τραγάνας Μετωπικά (Προς Αθήνα)
+                    totalpasses: '14'
+                    totalrevenue: '58.10'
+                  - tollid: KO09
+                    tollstationname: Σταθμός Διοδίων Μαυρομαντήλας Μετωπικά (Προς Αθήνα)
+                    totalpasses: '14'
+                    totalrevenue: '28.70'
+                  - tollid: NAO32
+                    tollstationname: Σταθμός Διοδίων Παιανίας Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '13'
+                    totalrevenue: '32.50'
+                  - tollid: AM05
+                    tollstationname: Σταθμός Διοδίων Μοσχοχωρίου Μετωπικά (Προς Αθήνα)
+                    totalpasses: '12'
+                    totalrevenue: '43.20'
+                  - tollid: NAO02
+                    tollstationname: Σταθμός Διοδίων Αγίας Παρασκευής Πλευρικά (Προς Παλλήνη)
+                    totalpasses: '11'
+                    totalrevenue: '27.50'
+                  - tollid: AM01
+                    tollstationname: Σταθμός Διοδίων Κλειδίου Μετωπικά (Προς Αθήνα)
+                    totalpasses: '11'
+                    totalrevenue: '22.00'
+                  - tollid: OO08
+                    tollstationname: Σταθμός Διοδίων Ισθμίων Μετωπικά (Προς Πάτρα)
+                    totalpasses: '11'
+                    totalrevenue: '20.90'
+                  - tollid: OO03
+                    tollstationname: Σταθμός Διοδίων Ρίου Μετωπικά (Προς Αθήνα)
+                    totalpasses: '11'
+                    totalrevenue: '26.40'
+                  - tollid: NAO24
+                    tollstationname: Σταθμός Διοδίων Κορωπίου Μετωπικά (Προς Ελευσίνα)
+                    totalpasses: '10'
+                    totalrevenue: '25.00'
+                  - tollid: OO06
+                    tollstationname: Σταθμός Διοδίων Ελαιώνα Μετωπικά (Προς Πάτρα)
+                    totalpasses: '10'
+                    totalrevenue: '35.00'
+                  - tollid: NAO15
+                    tollstationname: Σταθμός Διοδίων Γλυκών Νερών Πλευρικά (Προς Παλλήνη)
+                    totalpasses: '10'
+                    totalrevenue: '25.00'
+                  - tollid: NO04
+                    tollstationname: Σταθμός Διοδίων Κλόκοβας Μετωπικά (Προς Ρίο)
+                    totalpasses: '9'
+                    totalrevenue: '29.25'
+                  - tollid: GE01
+                    tollstationname: >-
+                      Σταθμός Διοδίων Γέφυρας Ρίου Αντιρρίου Μετωπικά (Προς
+                      Αντίρριο)
+                    totalpasses: '9'
+                    totalrevenue: '132.30'
+                  - tollid: AM02
+                    tollstationname: Σταθμός Διοδίων Κλειδίου Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '9'
+                    totalrevenue: '18.00'
+                  - tollid: NAO18
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Ηρακλείου Πλευρικά (Προς Αεροδρόμιο)
+                    totalpasses: '9'
+                    totalrevenue: '22.50'
+                  - tollid: NAO20
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Κύμης Πλευρικά (Προς Αεροδρόμιο)
+                    totalpasses: '9'
+                    totalrevenue: '22.50'
+                  - tollid: NAO26
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Κηφισίας Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '9'
+                    totalrevenue: '22.50'
+                  - tollid: NAO09
+                    tollstationname: >-
+                      Σταθμός Διοδίων Λεωφ. Δουκίσσης Πλακεντίας Πλευρικά (Προς
+                      Αεροδρόμιο)
+                    totalpasses: '9'
+                    totalrevenue: '22.50'
+                  - tollid: EG01
+                    tollstationname: Σταθμός Διοδίων Σήραγγας Ακτίου Μετωπικά (Προς Αγρίνιο)
+                    totalpasses: '9'
+                    totalrevenue: '27.00'
+                  - tollid: KO05
+                    tollstationname: Σταθμός Διοδίων Αγίας Τριάδας Μετωπικά (Προς Αθήνα)
+                    totalpasses: '9'
+                    totalrevenue: '17.10'
+                  - tollid: OO09
+                    tollstationname: Σταθμός Διοδίων Κιάτου Μετωπικά (Προς Αθήνα)
+                    totalpasses: '9'
+                    totalrevenue: '22.50'
+                  - tollid: EG32
+                    tollstationname: Σταθμός Διοδίων Ίασμου Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '9'
+                    totalrevenue: '12.60'
+                  - tollid: KO04
+                    tollstationname: Σταθμός Διοδίων Τρικάλων Μετωπικά (Προς Τρίκαλα)
+                    totalpasses: '9'
+                    totalrevenue: '26.55'
+                  - tollid: NO14
+                    tollstationname: Σταθμός Διοδίων Τραγάνας Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '9'
+                    totalrevenue: '37.35'
+                  - tollid: NAO23
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Φυλής Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '9'
+                    totalrevenue: '22.50'
+                  - tollid: EG37
+                    tollstationname: Σταθμός Διοδίων Μαλακασίου Μετωπικά (Προς Αλεξ/πολη)
+                    totalpasses: '9'
+                    totalrevenue: '12.60'
+                  - tollid: AM10
+                    tollstationname: Σταθμός Διοδίων Πελασγίας Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '9'
+                    totalrevenue: '27.90'
+                  - tollid: NAO41
+                    tollstationname: Σταθμός Διοδίων Κάντζας Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '9'
+                    totalrevenue: '22.50'
+                  - tollid: NAO03
+                    tollstationname: Σταθμός Διοδίων Δημόκριτου Πλευρικά (Προς Παλλήνη)
+                    totalpasses: '8'
+                    totalrevenue: '20.00'
+                  - tollid: NAO14
+                    tollstationname: Σταθμός Διοδίων Γλυκών Νερών Πλευρικά (Προς Καρέα)
+                    totalpasses: '8'
+                    totalrevenue: '20.00'
+                  - tollid: EG14
+                    tollstationname: Σταθμός Διοδίων Μαλγάρων Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '8'
+                    totalrevenue: '9.60'
+                  - tollid: NO06
+                    tollstationname: Σταθμός Διοδίων Μενιδίου Μετωπικά (Προς Ρίο)
+                    totalpasses: '8'
+                    totalrevenue: '26.00'
+                  - tollid: EG26
+                    tollstationname: Σταθμός Διοδίων Ευζώνων Μετωπικά (Προς Σύνορα)
+                    totalpasses: '8'
+                    totalrevenue: '14.40'
+                  - tollid: EG25
+                    tollstationname: Σταθμός Διοδίων Ευζώνων Μετωπικά (Προς Μάλγαρα)
+                    totalpasses: '8'
+                    totalrevenue: '14.40'
+                  - tollid: EG18
+                    tollstationname: Σταθμός Διοδίων Τύριας Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '8'
+                    totalrevenue: '16.80'
+                  - tollid: AM06
+                    tollstationname: Σταθμός Διοδίων Μοσχοχωρίου Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '8'
+                    totalrevenue: '28.80'
+                  - tollid: NO09
+                    tollstationname: Σταθμός Διοδίων Θήβας Μετωπικά (Προς Αθήνα)
+                    totalpasses: '8'
+                    totalrevenue: '33.60'
+                  - tollid: OO05
+                    tollstationname: Σταθμός Διοδίων Ελαιώνα Μετωπικά (Προς Αθήνα)
+                    totalpasses: '8'
+                    totalrevenue: '28.00'
+                  - tollid: NAO12
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Πεντέλης Πλευρικά (Προς Αεροδρόμιο)
+                    totalpasses: '8'
+                    totalrevenue: '20.00'
+                  - tollid: NAO28
+                    tollstationname: >-
+                      Σταθμός Διοδίων Αθηνών-Λαμίας Πλευρικά (Από Αθήνα Προς
+                      Ελευσίνα)
+                    totalpasses: '8'
+                    totalrevenue: '20.00'
+                  - tollid: KO10
+                    tollstationname: Σταθμός Διοδίων Μαυρομαντήλας Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '8'
+                    totalrevenue: '16.40'
+                  - tollid: NAO29
+                    tollstationname: >-
+                      Σταθμός Διοδίων Αθηνών-Λαμίας Πλευρικά (Από Λαμία Προς
+                      Αεροδρόμιο)
+                    totalpasses: '8'
+                    totalrevenue: '20.00'
+                  - tollid: NO07
+                    tollstationname: Σταθμός Διοδίων Αφιδνών Μετωπικά (Προς Αθήνα)
+                    totalpasses: '8'
+                    totalrevenue: '28.40'
+                  - tollid: AM03
+                    tollstationname: Σταθμός Διοδίων Μακρυχωρίου Μετωπικά (Προς Αθήνα)
+                    totalpasses: '8'
+                    totalrevenue: '17.60'
+                  - tollid: KO02
+                    tollstationname: Σταθμός Διοδίων Σοφάδων Μετωπικά (Προς Τρίκαλα)
+                    totalpasses: '8'
+                    totalrevenue: '27.20'
+                  - tollid: EG21
+                    tollstationname: Σταθμός Διοδίων Μουσθένης Μετωπικά (Προς Αλεξ/πολη)
+                    totalpasses: '8'
+                    totalrevenue: '12.80'
+                  - tollid: EG33
+                    tollstationname: Σταθμός Διοδίων Προμαχώνα Μετωπικά (Προς Προμαχώνα)
+                    totalpasses: '7'
+                    totalrevenue: '14.00'
+                  - tollid: NAO37
+                    tollstationname: Σταθμός Διοδίων Παπάγου Πλευρικά (Προς Καρέα)
+                    totalpasses: '7'
+                    totalrevenue: '17.50'
+                  - tollid: NAO10
+                    tollstationname: >-
+                      Σταθμός Διοδίων Λεωφ. Δουκίσσης Πλακεντίας Πλευρικά (Προς
+                      Ελευσίνα)
+                    totalpasses: '7'
+                    totalrevenue: '17.50'
+                  - tollid: NO03
+                    tollstationname: Σταθμός Διοδίων Κλόκοβας Μετωπικά (Προς Ιωάννινα)
+                    totalpasses: '7'
+                    totalrevenue: '22.75'
+                  - tollid: EG38
+                    tollstationname: Σταθμός Διοδίων Μαλακασίου Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '7'
+                    totalrevenue: '9.80'
+                  - tollid: EG22
+                    tollstationname: Σταθμός Διοδίων Μουσθένης Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '7'
+                    totalrevenue: '11.20'
+                  - tollid: NAO34
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Μαραθώνος Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '7'
+                    totalrevenue: '17.50'
+                  - tollid: NAO13
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Πεντέλης Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '7'
+                    totalrevenue: '17.50'
+                  - tollid: NAO30
+                    tollstationname: >-
+                      Σταθμός Διοδίων Αθηνών-Λαμίας Πλευρικά (Από Λαμία Προς
+                      Ελευσίνα)
+                    totalpasses: '7'
+                    totalrevenue: '17.50'
+                  - tollid: EG02
+                    tollstationname: Σταθμός Διοδίων Σήραγγας Ακτίου Μετωπικά (Προς Πρέβεζα)
+                    totalpasses: '7'
+                    totalrevenue: '21.00'
+                  - tollid: EG19
+                    tollstationname: Σταθμός Διοδίων Καβάλας Μετωπικά (Προς Αλεξ/πολη)
+                    totalpasses: '7'
+                    totalrevenue: '9.80'
+                  - tollid: OO07
+                    tollstationname: Σταθμός Διοδίων Ισθμίων Μετωπικά (Προς Αθήνα)
+                    totalpasses: '7'
+                    totalrevenue: '13.30'
+                  - tollid: OO01
+                    tollstationname: Σταθμός Διοδίων Ελευσίνας Μετωπικά (Προς Αθήνα)
+                    totalpasses: '7'
+                    totalrevenue: '16.10'
+                  - tollid: OO02
+                    tollstationname: Σταθμός Διοδίων Ελευσίνας Μετωπικά (Προς Πάτρα)
+                    totalpasses: '7'
+                    totalrevenue: '16.10'
+                  - tollid: AM08
+                    tollstationname: Σταθμός Διοδίων Λεπτοκαρυάς Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '7'
+                    totalrevenue: '19.60'
+                  - tollid: NAO19
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Ηρακλείου Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '7'
+                    totalrevenue: '17.50'
+                  - tollid: NAO39
+                    tollstationname: Σταθμός Διοδίων Ρουπακίου Μετωπικά (Προς Αεροδρόμιο)
+                    totalpasses: '7'
+                    totalrevenue: '17.50'
+                  - tollid: AM09
+                    tollstationname: Σταθμός Διοδίων Πελασγίας Μετωπικά (Προς Αθήνα)
+                    totalpasses: '7'
+                    totalrevenue: '21.70'
+                  - tollid: NAO31
+                    tollstationname: Σταθμός Διοδίων Παιανίας Πλευρικά (Προς Αεροδρόμιο)
+                    totalpasses: '7'
+                    totalrevenue: '17.50'
+                  - tollid: NAO21
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Κύμης Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '7'
+                    totalrevenue: '17.50'
+                  - tollid: EG04
+                    tollstationname: Σταθμός Διοδίων Αρδανίου Μετωπικά (Προς Κήπους)
+                    totalpasses: '7'
+                    totalrevenue: '8.40'
+                  - tollid: NAO16
+                    tollstationname: >-
+                      Σταθμός Διοδίων Λεωφ. Δημοκρατίας Πλευρικά (Προς
+                      Αεροδρόμιο)
+                    totalpasses: '7'
+                    totalrevenue: '17.50'
+                  - tollid: OO04
+                    tollstationname: Σταθμός Διοδίων Ρίου Μετωπικά (Προς Πάτρα)
+                    totalpasses: '7'
+                    totalrevenue: '16.80'
+                  - tollid: NO02
+                    tollstationname: Σταθμός Διοδίων Αγγελόκαστρου Μετωπικά (Προς Ρίο)
+                    totalpasses: '7'
+                    totalrevenue: '26.95'
+                  - tollid: KO01
+                    tollstationname: Σταθμός Διοδίων Σοφάδων Μετωπικά (Προς Λαμία)
+                    totalpasses: '6'
+                    totalrevenue: '20.40'
+                  - tollid: EG34
+                    tollstationname: Σταθμός Διοδίων Προμαχώνα Μετωπικά (Προς Σέρρες)
+                    totalpasses: '6'
+                    totalrevenue: '12.00'
+                  - tollid: EG24
+                    tollstationname: Σταθμός Διοδίων Ιεροπηγής Μετωπικά (Προς Σιάτιστα)
+                    totalpasses: '6'
+                    totalrevenue: '8.40'
+                  - tollid: EG05
+                    tollstationname: Σταθμός Διοδίων Μεστής Μετωπικά (Προς Αλεξ/πολη)
+                    totalpasses: '6'
+                    totalrevenue: '10.20'
+                  - tollid: NAO25
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Κηφισίας Πλευρικά (Προς Αεροδρόμιο)
+                    totalpasses: '6'
+                    totalrevenue: '15.00'
+                  - tollid: EG20
+                    tollstationname: Σταθμός Διοδίων Καβάλας Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '6'
+                    totalrevenue: '8.40'
+                  - tollid: EG11
+                    tollstationname: >-
+                      Σταθμός Διοδίων Θεσσαλονίκης Μετωπικά (Προς
+                      Αλεξανδρούπολη)
+                    totalpasses: '6'
+                    totalrevenue: '3.00'
+                  - tollid: EG36
+                    tollstationname: Σταθμός Διοδίων Στρυμονικού Μετωπικά (Προς Σέρρες)
+                    totalpasses: '6'
+                    totalrevenue: '6.00'
+                  - tollid: NAO36
+                    tollstationname: Σταθμός Διοδίων Κατεχάκη Μετωπικά (Προς Παλλήνη)
+                    totalpasses: '6'
+                    totalrevenue: '15.00'
+                  - tollid: KO03
+                    tollstationname: Σταθμός Διοδίων Τρικάλων Μετωπικά (Προς Λαμία)
+                    totalpasses: '6'
+                    totalrevenue: '17.70'
+                  - tollid: EG10
+                    tollstationname: Σταθμός Διοδίων Ασπροβάλτας Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '6'
+                    totalrevenue: '5.40'
+                  - tollid: EG06
+                    tollstationname: Σταθμός Διοδίων Μεστής Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '6'
+                    totalrevenue: '10.20'
+                  - tollid: OO10
+                    tollstationname: Σταθμός Διοδίων Κιάτου Μετωπικά (Προς Πάτρα)
+                    totalpasses: '6'
+                    totalrevenue: '15.00'
+                  - tollid: NAO17
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Δημοκρατίας Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '6'
+                    totalrevenue: '15.00'
+                  - tollid: KO07
+                    tollstationname: Σταθμός Διοδίων Λειανοκλαδίου Μετωπικά (Προς Λαμία)
+                    totalpasses: '6'
+                    totalrevenue: '11.10'
+                  - tollid: EG09
+                    tollstationname: Σταθμός Διοδίων Ασπροβάλτας Μετωπικά (Προς Αλεξανδρούπολη)
+                    totalpasses: '6'
+                    totalrevenue: '5.40'
+                  - tollid: EG03
+                    tollstationname: Σταθμός Διοδίων Αρδανίου Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '6'
+                    totalrevenue: '7.20'
+                  - tollid: NAO08
+                    tollstationname: Σταθμός Διοδίων Ασπροπύργου Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '6'
+                    totalrevenue: '15.00'
+                  - tollid: NAO33
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Μαραθώνος Πλευρικά (Προς Αεροδρόμιο)
+                    totalpasses: '6'
+                    totalrevenue: '15.00'
+                  - tollid: NAO04
+                    tollstationname: Σταθμός Διοδίων Ανθούσας Πλευρικά (Προς Ελευσίνα)
+                    totalpasses: '6'
+                    totalrevenue: '15.00'
+                  - tollid: EG28
+                    tollstationname: Σταθμός Διοδίων Πολύμυλου Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '6'
+                    totalrevenue: '8.40'
+                  - tollid: NAO05
+                    tollstationname: >-
+                      Σταθμός Διοδίων Περιφεριακής Αιγάλεω Πλευρικά (Προς
+                      Αεροδρόμιο)
+                    totalpasses: '6'
+                    totalrevenue: '15.00'
+                  - tollid: EG08
+                    tollstationname: Σταθμός Διοδίων Ανάληψης Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '6'
+                    totalrevenue: '10.80'
+                  - tollid: NAO27
+                    tollstationname: >-
+                      Σταθμός Διοδίων Αθηνών-Λαμίας Πλευρικά (Από Αθήνα Προς
+                      Αεροδρόμιο)
+                    totalpasses: '5'
+                    totalrevenue: '12.50'
+                  - tollid: EG15
+                    tollstationname: Σταθμός Διοδίων Παμβώτιδας Μετωπικά (Προς Αλεξ/πολη)
+                    totalpasses: '5'
+                    totalrevenue: '6.00'
+                  - tollid: EG29
+                    tollstationname: Σταθμός Διοδίων Σιάτιστας Μετωπικά (Προς Αλεξ/πολη)
+                    totalpasses: '5'
+                    totalrevenue: '7.50'
+                  - tollid: NAO22
+                    tollstationname: Σταθμός Διοδίων Λεωφ. Φυλής Πλευρικά (Προς Αεροδρόμιο)
+                    totalpasses: '5'
+                    totalrevenue: '12.50'
+                  - tollid: GE02
+                    tollstationname: Σταθμός Διοδίων Γέφυρας Ρίου Αντιρρίου Μετωπικά (Προς Ρίο)
+                    totalpasses: '5'
+                    totalrevenue: '73.50'
+                  - tollid: EG13
+                    tollstationname: Σταθμός Διοδίων Μαλγάρων Μετωπικά (Προς Αθήνα)
+                    totalpasses: '5'
+                    totalrevenue: '6.00'
+                  - tollid: NO12
+                    tollstationname: Σταθμός Διοδίων Τερόβου Μετωπικά (Προς Ρίο)
+                    totalpasses: '5'
+                    totalrevenue: '16.75'
+                  - tollid: NAO06
+                    tollstationname: >-
+                      Σταθμός Διοδίων Περιφεριακής Αιγάλεω Πλευρικά (Προς
+                      Ελευσίνα)
+                    totalpasses: '5'
+                    totalrevenue: '12.50'
+                  - tollid: EG30
+                    tollstationname: Σταθμός Διοδίων Σιάτιστας Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '5'
+                    totalrevenue: '7.50'
+                  - tollid: NAO01
+                    tollstationname: Σταθμός Διοδίων Αγίας Παρασκευής Πλευρικά (Προς Καρέα)
+                    totalpasses: '5'
+                    totalrevenue: '12.50'
+                  - tollid: AM07
+                    tollstationname: Σταθμός Διοδίων Λεπτοκαρυάς Μετωπικά (Προς Αθήνα)
+                    totalpasses: '5'
+                    totalrevenue: '14.00'
+                  - tollid: NAO35
+                    tollstationname: Σταθμός Διοδίων Παλλήνης Πλευρικά (Προς Καρέα)
+                    totalpasses: '5'
+                    totalrevenue: '12.50'
+                  - tollid: NO11
+                    tollstationname: Σταθμός Διοδίων Τερόβου Μετωπικά (Προς Ιωάννινα)
+                    totalpasses: '5'
+                    totalrevenue: '16.75'
+                  - tollid: NAO11
+                    tollstationname: >-
+                      Σταθμός Διοδίων Λεωφ. Δουκίσσης Πλακεντίας Πλευρικά (Προς
+                      Καρέα)
+                    totalpasses: '4'
+                    totalrevenue: '10.00'
+                  - tollid: EG27
+                    tollstationname: Σταθμός Διοδίων Πολύμυλου Μετωπικά (Προς Αλεξ/πολη)
+                    totalpasses: '4'
+                    totalrevenue: '5.60'
+                  - tollid: KO06
+                    tollstationname: Σταθμός Διοδίων Αγίας Τριάδας Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '4'
+                    totalrevenue: '7.60'
+                  - tollid: EG12
+                    tollstationname: Σταθμός Διοδίων Θεσσαλονίκης Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '4'
+                    totalrevenue: '2.00'
+                  - tollid: NO08
+                    tollstationname: Σταθμός Διοδίων Αφιδνών Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '4'
+                    totalrevenue: '14.20'
+                  - tollid: NO05
+                    tollstationname: Σταθμός Διοδίων Μενιδίου Μετωπικά (Προς Ιωάννινα)
+                    totalpasses: '4'
+                    totalrevenue: '13.00'
+                  - tollid: NAO40
+                    tollstationname: Σταθμός Διοδίων Κάντζας Πλευρικά (Προς Αεροδρόμιο)
+                    totalpasses: '4'
+                    totalrevenue: '10.00'
+                  - tollid: NAO07
+                    tollstationname: Σταθμός Διοδίων Ασπροπύργου Πλευρικά (Προς Αεροδρόμιο)
+                    totalpasses: '4'
+                    totalrevenue: '10.00'
+                  - tollid: EG07
+                    tollstationname: Σταθμός Διοδίων Ανάληψης Μετωπικά (Προς Αλεξ/πολη)
+                    totalpasses: '3'
+                    totalrevenue: '5.40'
+                  - tollid: EG17
+                    tollstationname: Σταθμός Διοδίων Τύριας Μετωπικά (Προς Αλεξ/πολη)
+                    totalpasses: '3'
+                    totalrevenue: '6.30'
+                  - tollid: EG31
+                    tollstationname: Σταθμός Διοδίων Ίασμου Μετωπικά (Προς Αλεξ/πολη)
+                    totalpasses: '3'
+                    totalrevenue: '4.20'
+                  - tollid: EG23
+                    tollstationname: Σταθμός Διοδίων Ιεροπηγής Μετωπικά (Προς Κρυσταλλοπηγή)
+                    totalpasses: '3'
+                    totalrevenue: '4.20'
+                  - tollid: AM04
+                    tollstationname: Σταθμός Διοδίων Μακρυχωρίου Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '3'
+                    totalrevenue: '6.60'
+                  - tollid: KO08
+                    tollstationname: Σταθμός Διοδίων Λειανοκλαδίου Μετωπικά (Προς Τρίκαλα)
+                    totalpasses: '3'
+                    totalrevenue: '5.55'
+                  - tollid: NO10
+                    tollstationname: Σταθμός Διοδίων Θήβας Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '3'
+                    totalrevenue: '12.60'
+                  - tollid: EG35
+                    tollstationname: Σταθμός Διοδίων Στρυμονικού Μετωπικά (Προς Θεσσαλονίκη)
+                    totalpasses: '3'
+                    totalrevenue: '3.00'
+                  - tollid: NAO38
+                    tollstationname: Σταθμός Διοδίων Παπάγου Πλευρικά (Προς Παλλήνη)
+                    totalpasses: '2'
+                    totalrevenue: '5.00'
+                  - tollid: EG16
+                    tollstationname: Σταθμός Διοδίων Παμβώτιδας Μετωπικά (Προς Ηγουμενίτσα)
+                    totalpasses: '2'
+                    totalrevenue: '2.40'
+                  - tollid: NO01
+                    tollstationname: Σταθμός Διοδίων Αγγελόκαστρου Μετωπικά (Προς Ιωάννινα)
+                    totalpasses: '1'
+                    totalrevenue: '3.85'
+  /api/debts:
+    get:
+      tags:
+        - Debts
+      summary: https://localhost:9115/api/debts
+      description: >-
+        Returns debts that are owned to the current logged in operator as well
+        as the debts that he owns and their respective party
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InVzZXIiLCJ1c2VybmFtZSI6Im1vcmVhcyIsImlhdCI6MTczODUwMzczNiwiZXhwIjoxNzM4NTkwMTM2fQ._QtntK9eMTBfPTWp2EaGKrd94yWUCS63vMGyTr9FmFo
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '342'
+            ETag:
+              schema:
+                type: string
+                example: W/"156-2yRxgokzmxle0evoIlobgXHjKYs"
+            Date:
+              schema:
+                type: string
+                example: Sun, 02 Feb 2025 13:42:46 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                owes:
+                  - operator: neaodos
+                    opId: 'NO'
+                    amount: '1.00'
+                  - operator: olympiaodos
+                    opId: OO
+                    amount: '1.95'
+                owned:
+                  - operator: aegeanmotorway
+                    opId: AM
+                    amount: '0.35'
+                  - operator: egnatia
+                    opId: EG
+                    amount: '6.35'
+                  - operator: kentrikiodos
+                    opId: KO
+                    amount: '3.35'
+                  - operator: naodos
+                    opId: NAO
+                    amount: '2.20'
+  /api/debts/pay:
+    post:
+      tags:
+        - Debts
+      summary: https://localhost:9115/api/debts/pay
+      description: >-
+        Allows the current logged in user to pay a specified amount to a
+        specified operator he owns money to.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                toOperatorId: 'NO'
+                amount: '2.20'
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InVzZXIiLCJ1c2VybmFtZSI6Im1vcmVhcyIsImlhdCI6MTczODQxMDIyNiwiZXhwIjoxNzM4NDk2NjI2fQ.CB-Z7zJp5zLNlM3lFyc04OmLfYbvZJYXloLWhBAdmNA
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '62'
+            ETag:
+              schema:
+                type: string
+                example: W/"3e-cHfTlKKU4AkWspxhzTG5n41d0kM"
+            Date:
+              schema:
+                type: string
+                example: Sat, 01 Feb 2025 12:15:44 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: Payment processed successfully
+                remainingDebt: 1
+  /api/logout:
+    post:
+      tags:
+        - General
+      summary: https://localhost:9115/api/logout
+      description: >-
+        Logs the user out, returns 200 status code if successful and no content.
+        Actual logging out happens in the cli/ui as its a jwt authentication
+        keeping the api stateless.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: ''
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE1MTcwLCJleHAiOjE3MzYyMDE1NzB9.uETRavgG7C85YhYTlxMMU3gCfAaQ4q3nIcOi8uKVCHo
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/login:
+    post:
+      tags:
+        - General
+      summary: https://localhost:9115/api/login
+      description: Log into the system
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: moreas
+                password: jinx
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '169'
+            ETag:
+              schema:
+                type: string
+                example: W/"a9-cH33QbfO2W+g60irO5TGxz4cJLk"
+            Date:
+              schema:
+                type: string
+                example: Sun, 05 Jan 2025 23:03:06 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                token: >-
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzM2MTE4MTg2LCJleHAiOjE3MzYyMDQ1ODZ9.65oJOoSxx82fF_vvym8MdIj4ozeKZgnBZ0wLp3TrQcY
+  /api/operators:
+    get:
+      tags:
+        - General
+      summary: https://localhost:9115/api/operators
+      description: Get all registered operators along with their id in the country.
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: X-OBSERVATORY-AUTH
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InVzZXIiLCJ1c2VybmFtZSI6Im1vcmVhcyIsImlhdCI6MTczODYwMDYyNywiZXhwIjoxNzM4Njg3MDI3fQ.E3vZkBzzBL8FL5O2bfwZIxWLgWFKGXfrer5kjxHtOGw
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '311'
+            ETag:
+              schema:
+                type: string
+                example: W/"137-pqk8SQohQsQIFR+h/zMEaK6ZqPs"
+            Date:
+              schema:
+                type: string
+                example: Mon, 03 Feb 2025 16:39:21 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - operatorid: AM
+                  name: aegeanmotorway
+                - operatorid: EG
+                  name: egnatia
+                - operatorid: GE
+                  name: gefyra
+                - operatorid: KO
+                  name: kentrikiodos
+                - operatorid: MO
+                  name: moreas
+                - operatorid: NAO
+                  name: naodos
+                - operatorid: 'NO'
+                  name: neaodos
+                - operatorid: OO
+                  name: olympiaodos

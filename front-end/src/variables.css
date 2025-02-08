@@ -1,0 +1,37 @@
+:root {
+  /* Color Palette */
+  --primary-50: #e6f3ff;
+  --primary-100: #b3d7ff;
+  --primary-200: #80bcff;
+  --primary-300: #4da0ff;
+  --primary-400: #1a85ff;
+  --primary-500: #0066e5;
+  --primary-600: #0052b8;
+  --primary-700: #003d8a;
+  --primary-800: #00295c;
+  --primary-900: #00142e;
+
+  /* Neutral Colors */
+  --neutral-50: #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Typography */
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}

@@ -1,6 +1,12 @@
 const { Pass, Operator } = require("../models");
 const { formatResponse, getContentType } = require("../utils/formatResponse");
 
+// UTC+2
+const addTimezoneOffset = (date) => {
+  const offset = date.getTimezoneOffset(); // Offset in minutes
+  return new Date(date.getTime() - offset * 60000);
+};
+
 const passController = {
   async getPassAnalysis(req, res) {
     try {
@@ -26,7 +32,7 @@ const passController = {
       const response = {
         stationOpID,
         tagOpID,
-        requestTimestamp: new Date()
+        requestTimestamp: addTimezoneOffset(new Date())
           .toISOString()
           .replace("T", " ")
           .slice(0, 16),
@@ -37,7 +43,7 @@ const passController = {
           passIndex: index + 1,
           passID: pass.passid,
           stationID: pass.tollid,
-          timestamp: pass.timestamp
+          timestamp: addTimezoneOffset(pass.timestamp)
             .toISOString()
             .replace("T", " ")
             .slice(0, 16),
@@ -80,7 +86,7 @@ const passController = {
       const response = {
         tollOpID,
         tagOpID,
-        requestTimestamp: new Date()
+        requestTimestamp: addTimezoneOffset(new Date())
           .toISOString()
           .replace("T", " ")
           .slice(0, 16),
@@ -139,7 +145,7 @@ const passController = {
 
       const response = {
         tollOpID,
-        requestTimestamp: new Date()
+        requestTimestamp: addTimezoneOffset(new Date())
           .toISOString()
           .replace("T", " ")
           .slice(0, 16),

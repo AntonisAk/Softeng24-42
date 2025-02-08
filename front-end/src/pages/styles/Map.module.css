@@ -1,0 +1,22 @@
+.map h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: var(--neutral-900);
+}
+
+.mapContainer {
+  /*This fixes the logout popup bug */
+  z-index: 1;        
+  position: relative;
+  max-width: 1200px;
+  margin: 2rem auto 2rem;
+  padding: 0 2rem;
+  text-align: center;
+  overflow: hidden; /*Round the corners */
+  border-radius: 30px;
+}
+
+.mapContainer > div {
+  border-radius: 30px; /* Ensure Leaflet map follows the rounded shape */
+}
+

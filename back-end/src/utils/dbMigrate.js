@@ -16,7 +16,7 @@ async function createTables() {
         UserID SERIAL PRIMARY KEY,
         Role VARCHAR(20) NOT NULL,
         Username VARCHAR(20) UNIQUE NOT NULL,
-        Password VARCHAR(30) NOT NULL,
+        Password VARCHAR(60) NOT NULL,
         Email VARCHAR(20)
       );
     `);
@@ -62,7 +62,8 @@ async function createTables() {
         tagRef VARCHAR(20) NOT NULL,
         tagHomeID VARCHAR(10) NOT NULL,
         charge DECIMAL(10,2) NOT NULL,
-        CONSTRAINT valid_charge CHECK (charge >= 0)
+        CONSTRAINT valid_charge CHECK (charge >= 0),
+        CONSTRAINT unique_pass UNIQUE (timestamp, TollID, tagRef, tagHomeID)
       );
     `);
 
@@ -159,34 +160,20 @@ async function importPasses(filePath) {
   try {
     await client.query("BEGIN");
 
-    for (const record of records) {
-      const stationResult = await client.query(
-        `SELECT OperatorID FROM Tollstations WHERE TollID = $1`,
-        [record.tollID]
-      );
+    const passValues = records
+      .map(
+        (r) =>
+          `('${r.timestamp}', '${r.tollID}', '${r.tagRef}', '${r.tagHomeID}', ${r.charge})`
+      )
+      .join(",");
 
-      const tollOperatorId = stationResult.rows[0].operatorid;
+    await client.query(`
+      INSERT INTO Passes (timestamp, TollID, tagRef, tagHomeID, charge)
+      VALUES ${passValues}
+      ON CONFLICT (timestamp, TollID, tagRef, tagHomeID) DO NOTHING;
+    `);
 
-      await client.query(
-        `INSERT INTO Passes (timestamp, TollID, tagRef, tagHomeID, charge)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [
-          record.timestamp,
-          record.tollID,
-          record.tagRef,
-          record.tagHomeID,
-          record.charge,
-        ]
-      );
-
-      if (tollOperatorId !== record.tagHomeID) {
-        await Debt.updateDebtFromPass(
-          tollOperatorId,
-          record.tagHomeID,
-          record.charge
-        );
-      }
-    }
+    await Debt.updateDebtFromPass(records);
 
     await Debt.reconcileDebts();
 
