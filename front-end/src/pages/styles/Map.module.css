@@ -1,4 +1,7 @@
 .mapContainer {
+  /*This fixes the logout popup bug */
+  z-index: 1;        
+  position: relative;
   max-width: 1200px;
   margin: 6rem auto 2rem;
   padding: 0 2rem;
