@@ -14,10 +14,25 @@ function Debts() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState("");
 
+  const removeDuplicateDebts = (debtsArray) => {
+    const seenOperators = new Set();
+    return debtsArray.reduce((uniqueDebts, debt) => {
+      if (!seenOperators.has(debt.operator)) {
+        seenOperators.add(debt.operator);
+        uniqueDebts.push(debt);
+      }
+      return uniqueDebts;
+    }, []);
+  };
+  
   const fetchDebts = async () => {
     try {
       const data = await apiClient.getDebts(auth.token);
-      setDebts(data);
+      
+      const uniqueOwes = removeDuplicateDebts(data.owes);
+      const uniqueOwned = removeDuplicateDebts(data.owned);
+  
+      setDebts({ owes: uniqueOwes, owned: uniqueOwned });
       setError(null);
     } catch (err) {
       console.log(err.message);
@@ -26,7 +41,7 @@ function Debts() {
       setIsLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchDebts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
