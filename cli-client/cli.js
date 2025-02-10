@@ -136,11 +136,19 @@ const handlers = {
 yargs(hideBin(process.argv))
   .command("healthcheck", "Check system health", {}, async (argv) => {
     const result = await handlers.healthcheck(argv);
-    console.log(result);
+    if (argv.format === "json") {
+      console.log(JSON.stringify(result, null, 2));  
+    } else {
+      console.log(result);
+    }
   })
   .command("resetpasses", "Reset passes in the system", {}, async (argv) => {
     const result = await handlers.resetpasses(argv);
-    console.log(formatResponse(result, argv.format));
+    if (argv.format === "json") {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(formatResponse(result, argv.format));
+    }
   })
   .command(
     "resetstations",
@@ -148,7 +156,11 @@ yargs(hideBin(process.argv))
     {},
     async (argv) => {
       const result = await handlers.resetstations(argv);
-      console.log(formatResponse(result, argv.format));
+      if (argv.format === "json") {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        console.log(formatResponse(result, argv.format));
+      }
     }
   )
   .command(
@@ -168,12 +180,20 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       const result = await handlers.login(argv);
-      console.log(formatResponse(result, argv.format));
+      if (argv.format === "json") {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        console.log(formatResponse(result, argv.format));
+      }
     }
   )
   .command("logout", "Logout from the system", {}, async (argv) => {
     const result = await handlers.logout();
-    console.log(formatResponse(result, argv.format));
+    if (argv.format === "json") {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(formatResponse(result, argv.format));
+    }
   })
   .command(
     "tollstationpasses",
@@ -197,7 +217,11 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       const result = await handlers.tollstationpasses(argv);
-      console.log(result);
+      if (argv.format === "json") {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        console.log(result);
+      }
     }
   )
   .command(
@@ -227,7 +251,11 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       const result = await handlers.passanalysis(argv);
-      console.log(result);
+      if (argv.format === "json") {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        console.log(result);
+      }
     }
   )
   .command(
@@ -257,7 +285,11 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       const result = await handlers.passescost(argv);
-      console.log(result);
+      if (argv.format === "json") {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        console.log(result);
+      }
     }
   )
   .command(
@@ -282,7 +314,11 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       const result = await handlers.chargesby(argv);
-      console.log(result);
+      if (argv.format === "json") {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        console.log(result);
+      }
     }
   )
   .command(
@@ -327,10 +363,18 @@ yargs(hideBin(process.argv))
             username: argv.username,
             password: argv.passw,
           });
-          console.log(formatResponse(response.data, argv.format));
+          if (argv.format === "json") {
+            console.log(JSON.stringify(response.data, null, 2));
+          } else {
+            console.log(formatResponse(response.data, argv.format));
+          }
         } else if (argv.users) {
           const response = await api.get("/users");
-          console.log(response.data);
+          if (argv.format === "json") {
+            console.log(JSON.stringify(response.data, null, 2));
+          } else {
+            console.log(response.data);
+          }
         } else if (argv.addpasses) {
           if (!argv.source) {
             console.error("Error: --source is required for --addpasses");
@@ -354,7 +398,11 @@ yargs(hideBin(process.argv))
             },
             params: { format: argv.format },
           });
-          console.log(response.data);
+          if (argv.format === "json") {
+            console.log(JSON.stringify(response.data, null, 2));
+          } else {
+            console.log(response.data);
+          }
         } else {
           console.error(
             "Error: One of --usermod, --users, or --addpasses is required"
