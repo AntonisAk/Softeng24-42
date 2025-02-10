@@ -93,7 +93,7 @@ const passController = {
         periodFrom: dateFrom,
         periodTo: dateTo,
         nPasses: parseInt(result.npasses),
-        passesCost: parseFloat(result.totalcost),
+        passesCost: parseFloat(result.totalcost) || 0,
       };
 
       res.setHeader("Content-Type", getContentType(format));
@@ -138,7 +138,7 @@ const passController = {
           return {
             visitingOpID: op.operatorid,
             nPasses: parseInt(result.npasses),
-            passesCost: parseFloat(result.totalcost),
+            passesCost: parseFloat(result.totalcost) || 0,
           };
         })
       );

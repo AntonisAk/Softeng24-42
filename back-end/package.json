@@ -4,7 +4,14 @@
   "description": "Ενδεικτικά περιεχόμενα:",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test jest --detectOpenHandles --testMatch '**/*.test.js' --forceExit",
+    "test:watch": "NODE_ENV=test jest --watch --testMatch '**/*.test.js'"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./__tests__/setup.js"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -22,5 +29,9 @@
     "multer": "^1.4.5-lts.1",
     "pg": "^8.13.1",
     "postman-to-openapi": "^3.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   }
 }
