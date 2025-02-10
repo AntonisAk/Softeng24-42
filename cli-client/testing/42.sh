@@ -1,5 +1,5 @@
 se2442 logout
-se2442 login --username [your username] --passw [your password]
+se2442 login --username admin --passw freepasses4all
 se2442 healthcheck
 se2442 resetpasses
 se2442 healthcheck
