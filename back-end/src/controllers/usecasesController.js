@@ -113,7 +113,7 @@ const processPayment = async (req, res) => {
         .json({ error: "No debt record found between these operators" });
     }
 
-    const currentDebt = debtRows[0].amount;
+    const currentDebt = parseFloat(debtRows[0].amount);
 
     if (amount > currentDebt) {
       await client.query("ROLLBACK");
@@ -272,7 +272,8 @@ const getOperatorsWithStations = async (req, res) => {
     const userOperatorId = operatorRows[0].operatorid;
 
     // Step 3: Get passes through each of the user's operator's toll stations
-    const { rows: incomingPasses } = await client.query(`
+    const { rows: incomingPasses } = await client.query(
+      `
       SELECT 
         p.TollID,
         t.Name AS TollStationName,
@@ -283,10 +284,13 @@ const getOperatorsWithStations = async (req, res) => {
       WHERE t.OperatorID = $1
       GROUP BY p.TollID, t.Name
       ORDER BY TotalPasses DESC;
-    `, [userOperatorId]);
+    `,
+      [userOperatorId]
+    );
 
     // Step 4: Get passes of the user's operator through other operators' toll stations
-    const { rows: outgoingPasses } = await client.query(`
+    const { rows: outgoingPasses } = await client.query(
+      `
       SELECT 
         p.TollID,
         t.Name AS TollStationName,
@@ -297,7 +301,9 @@ const getOperatorsWithStations = async (req, res) => {
       WHERE p.TagHomeID = $1 AND t.OperatorID != $1
       GROUP BY p.TollID, t.Name
       ORDER BY TotalPasses DESC;
-    `, [userOperatorId]);
+    `,
+      [userOperatorId]
+    );
 
     // Step 5: Send the complete response
     res.json({
@@ -306,7 +312,6 @@ const getOperatorsWithStations = async (req, res) => {
       incomingPasses, // Passes through each of user's operator's toll stations
       outgoingPasses, // User's operator's passes through other toll stations
     });
-
   } catch (error) {
     res.status(500).json({ error: error.message });
   } finally {
