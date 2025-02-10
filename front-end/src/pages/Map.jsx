@@ -15,16 +15,16 @@ L.Icon.Default.mergeOptions({
 });
 
 // Custom marker icons
-const userOperatorIcon = new L.Icon({
-  iconUrl: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png", // Blue icon for user’s operator
+const otherOperatorIcon = new L.Icon({
+  iconUrl: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png", // Blue icon for other operator
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
-const otherOperatorIcon = new L.Icon({
-  iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png", // Red icon for other operators
+const userOperatorIcon = new L.Icon({
+  iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png", // Red icon for users operators
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],

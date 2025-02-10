@@ -113,7 +113,7 @@ const processPayment = async (req, res) => {
         .json({ error: "No debt record found between these operators" });
     }
 
-    const currentDebt = parseFloat(debtRows[0].amount);
+    const currentDebt = debtRows[0].amount;
 
     if (amount > currentDebt) {
       await client.query("ROLLBACK");
@@ -313,8 +313,6 @@ const getOperatorsWithStations = async (req, res) => {
     client.release();
   }
 };
-
-
 
 module.exports = {
   getOperatorDebts,
