@@ -30,8 +30,8 @@ const tollController = {
       );
 
       const response = {
-        stationID: station.tollid,
-        stationOperator: station.operatorid,
+        stationID: station ? station.tollid : tollStationID,
+        stationOperator: station ?station.operatorid : "no opearator",
         requestTimestamp: addTimezoneOffset(new Date())
           .toISOString()
           .replace("T", " ")

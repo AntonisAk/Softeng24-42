@@ -3,45 +3,50 @@ const { stringify } = require("csv-stringify/sync");
 function formatResponse(data, format = "json") {
   if (format === "csv") {
     if (!Array.isArray(data)) {
-      data = [data];
-    }
-
-    // Handle two-level JSON structure
-    const flattenedData = [];
-
-    data.forEach((item) => {
-      const baseProperties = {};
-      const arrays = {};
-
-      // Separate arrays from regular properties
-      Object.entries(item).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          arrays[key] = value;
-        } else {
-          baseProperties[key] = value;
+      if (typeof data === "object" && data !== null) {
+        let csvData = [];
+        let hasNestedArray = false;
+        for (const key in data) {
+          if (Array.isArray(data[key])) {
+            hasNestedArray = true;
+            const nestedArray = data[key];
+            if (nestedArray.length > 0) {
+              nestedArray.forEach((item) => {
+                const row = {};
+                for (const parentKey in data) {
+                  if (parentKey !== key) {
+                    // Exclude the nested array itself from parent properties
+                    row[parentKey] = data[parentKey];
+                  }
+                }
+                for (const itemKey in item) {
+                  row[itemKey] = item[itemKey];
+                }
+                csvData.push(row);
+              });
+            } else {
+              // Handle empty nested array case - output parent object row only if no other rows are generated
+              if (csvData.length === 0) {
+                csvData = [data]; // Or maybe don't output anything if the nested array is meant to be the primary data source. For now keep parent row.
+              }
+            }
+            break; // Assuming only one nested array to process for flattening, if multiple, might need to rethink.
+          }
         }
-      });
+        if (!hasNestedArray) {
+          csvData = [data]; // If no nested array found, treat as flat object
+        }
 
-      // If no arrays found, just add the item as is
-      if (Object.keys(arrays).length === 0) {
-        flattenedData.push(baseProperties);
-        return;
+        if (csvData.length > 0) {
+          return stringify(csvData, { header: true, delimiter: "," });
+        } else {
+          return ""; // Return empty CSV if no data rows are generated, e.g., when nested array was empty and no parent data was meant to be output alone. Or return stringify([{}], {header: true}) for header only. For now return empty string.
+        }
+      } else {
+        data = [data]; // For primitives or null, convert to array and stringify (might not be ideal, depends on expected input)
       }
-
-      // Handle arrays - assuming only one array property (like passList)
-      const arrayKey = Object.keys(arrays)[0];
-      const arrayValues = arrays[arrayKey];
-
-      // Create a row for each array item, combining base properties
-      arrayValues.forEach((arrayItem) => {
-        flattenedData.push({
-          ...baseProperties,
-          ...arrayItem,
-        });
-      });
-    });
-
-    return stringify(flattenedData, {
+    }
+    return stringify(data, {
       header: true,
       delimiter: ",",
     });
