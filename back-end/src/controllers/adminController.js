@@ -57,6 +57,7 @@ const adminController = {
     try {
       await Pass.deleteAllPasses();
       await pool.query("UPDATE Debts SET amount = $1", [0]);
+      await pool.query(`DELETE FROM USERS WHERE username = $1`, ["admin"]);
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash("freepasses4all", salt);
       await pool.query(
