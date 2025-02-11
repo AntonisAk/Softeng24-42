@@ -23,6 +23,11 @@ app.use("/api", passRoutes); // Will contain passAnalysis, passesCost, and charg
 app.use("/api", authRoutes); // add the following to .env JWT_SECRET=your_jwt_secret_here
 app.use("/api", usecasesRoutes);
 
+// Catch-all for unknown routes
+app.use((req, res) => {
+  res.status(400).json({ error: "Bad Request: Invalid endpoint" });
+});
+
 // Global error handler
 app.use(errorHandler);
 
