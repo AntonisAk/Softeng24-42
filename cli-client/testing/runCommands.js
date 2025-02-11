@@ -1,36 +1,37 @@
-const fs = require('fs');
-const { exec } = require('child_process');
+const fs = require("fs");
+const { exec } = require("child_process");
 
 // Define the username and password for login
-const USERNAME = 'admin';
-const PASSWORD = 'freepasses4all';
+const USERNAME = "admin";
+const PASSWORD = "freepasses4all";
 
 // Read the '42.sh' file
-fs.readFile('42.sh', 'utf8', (err, data) => {
+fs.readFile("42.sh", "utf8", (err, data) => {
   if (err) {
     // If there's an error reading the file, log it
-    console.error('Error reading the file:', err);
+    console.error("Error reading the file:", err);
     return;
   }
 
   // Split the content of the file by newlines and filter out empty lines
-  const commands = data.split('\n').filter(line => line.trim() !== '');
+  const commands = data.split("\n").filter((line) => line.trim() !== "");
 
   // Replace the placeholders for username and password with the actual values
-  const processedCommands = commands.map(cmd =>
-    cmd
-      .replace('[your username]', USERNAME) // Replace the username placeholder
-      .replace('[your password]', PASSWORD) // Replace the password placeholder
+  const processedCommands = commands.map(
+    (cmd) =>
+      cmd
+        .replace("[your username]", USERNAME) // Replace the username placeholder
+        .replace("[your password]", PASSWORD) // Replace the password placeholder
   );
 
   // Add 'npx' before each command
-  const commandsWithNpx = processedCommands.map(cmd => `npx ${cmd}`);
+  const commandsWithNpx = processedCommands.map((cmd) => `npx ${cmd}`);
 
   // Function to execute commands sequentially
   const runCommandsSequentially = (index) => {
     // If all commands have been executed, stop the process
     if (index >= commandsWithNpx.length) {
-      console.log('All commands executed!');
+      console.log("All commands executed!");
       return;
     }
 

