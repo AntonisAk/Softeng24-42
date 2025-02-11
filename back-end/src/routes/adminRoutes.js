@@ -11,6 +11,9 @@ router.get(
   validate(schemas.formatQuery, "query"),
   adminController.healthcheck
 );
+router.post("/healthcheck", (req, res) =>
+  res.status(400).json({ error: "Bad Request" })
+);
 router.post(
   "/resetstations",
   validate(schemas.formatQuery, "query"),
