@@ -3,4 +3,4 @@ back-end/.env
 back-end/src/cert.pem
 back-end/src/key.pem
 back-end/src/cert.csr
-cli-client/node_modules/
+cli-client/node_modules
