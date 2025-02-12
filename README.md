@@ -124,13 +124,13 @@ npm test
 ## Screenshots 📸
 
 <p align="center">
-  <img src="front-end/screenshots/home1.png" width="90%" height="500px" style="margin-bottom: 30px" /><br>
-  <img src="front-end/screenshots/home2.png" width="90%" height="500px" style="margin-bottom: 30px" /><br>
-  <img src="front-end/screenshots/piechart.png" width="90%" height="500px" style="margin-bottom: 30px" /><br>
-  <img src="front-end/screenshots/debts.png" width="30%" height="300px" />
-  <img src="front-end/screenshots/linechart.png" width="30%" height="300px" />
-  <img src="front-end/screenshots/barchart.png" width="30%" height="300px" /><br>
-  <img src="front-end/screenshots/map.png" width="90%" height="500px" style="margin-top: 30px" />
+  <img src="front-end/screenshots/home1.png" width="90%" height="350px" style="margin-bottom: 60px" /><br>
+  <img src="front-end/screenshots/home2.png" width="90%" height="350px" style="margin-bottom: 60px" /><br>
+  <img src="front-end/screenshots/piechart.png" width="90%" height="350px" style="margin-bottom: 60px" /><br>
+  <img src="front-end/screenshots/debts.png" width="30%" height="200px" />
+  <img src="front-end/screenshots/linechart.png" width="30%" height="200px" />
+  <img src="front-end/screenshots/barchart.png" width="30%" height="200px" /><br>
+  <img src="front-end/screenshots/map.png" width="90%" height="350px" style="margin-top: 60px" />
 </p>
 
 ## Important Notes ⚠️
