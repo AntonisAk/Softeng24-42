@@ -56,26 +56,13 @@ TEST_DB_NAME=interpay_test
 
 ### 3. Install Dependencies
 
-Choose your operating system:
-
-**Windows:**
-
-```bash
-npm install --prefix front-end && npm install --prefix back-end && npm install --prefix cli-client
-```
-
-**UNIX:**
-
-```bash
-npm install --prefix front-end & npm install --prefix back-end & npm install --prefix cli-client
-```
-
-> **Note**: If you encounter issues, run `npm install` manually in each directory.
+Run `npm install` manually in each directory (front-end/, back-end/, cli-client/).
 
 ### 4. Initialize Database
 
 ```bash
 cd back-end
+./generate-cert.sh                 # generate certificate for https
 node src/scripts/initEmptyDb.js    # Creates schema and initializes user accounts
 ```
 
@@ -136,4 +123,3 @@ npm test
 ## Important Notes ⚠️
 
 - The frontend UI is designed for operators only. When logging in, ensure your username matches an operator account, otherwise features like charts won't be rendered.
-- Administrative functions are accessible through the CLI interface only.
