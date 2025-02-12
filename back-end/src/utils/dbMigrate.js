@@ -5,33 +5,6 @@ const path = require("path");
 const { parse } = require("csv-parse/sync");
 const bcrypt = require("bcrypt");
 
-async function createDatabase() {
-  const client = await pool.connect();
-  try {
-    await client.query(`
-      DROP DATABASE IF EXISTS interpaytoll;
-    `);
-
-    await client.query(`
-      DROP DATABASE IF EXISTS interpay_test;
-    `);
-
-    await client.query(`
-      CREATE DATABASE interpay_test;
-    `);
-
-    await client.query(`
-      CREATE DATABASE interpay_test;
-    `);
-
-    console.log("Database created successfully");
-  } catch (err) {
-    throw err;
-  } finally {
-    client.release();
-  }
-}
-
 async function createTables() {
   const client = await pool.connect();
 
@@ -285,7 +258,6 @@ async function dropTables() {
 }
 
 module.exports = {
-  createDatabase,
   createTables,
   importStations,
   importPasses,
