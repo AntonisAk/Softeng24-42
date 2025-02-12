@@ -61,13 +61,13 @@ Choose your operating system:
 **Windows:**
 
 ```bash
-npm install --prefix frontend && npm install --prefix backend && npm install --prefix cli
+npm install --prefix front-end && npm install --prefix back-end && npm install --prefix cli-client
 ```
 
 **UNIX:**
 
 ```bash
-npm install --prefix frontend & npm install --prefix backend & npm install --prefix cli
+npm install --prefix front-end & npm install --prefix back-end & npm install --prefix cli-client
 ```
 
 > **Note**: If you encounter issues, run `npm install` manually in each directory.
