@@ -61,9 +61,9 @@ Run `npm install` manually in each directory (front-end/, back-end/, cli-client/
 ### 4. Initialize Database
 
 ```bash
-cd back-end
+cd back-end/src
 ./generate-cert.sh                 # generate certificate for https
-node src/scripts/initEmptyDb.js    # Creates schema and initializes user accounts
+node scripts/initEmptyDb.js    # Creates schema and initializes user accounts
 ```
 
 ### 5. Start the Application
